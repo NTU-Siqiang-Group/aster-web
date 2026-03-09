@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="Aster documentation: API definitions and examples"/>
+  <title>Aster Docs — API & Examples</title>
+  <link rel="stylesheet" href="../assets/css/main.css"/>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="../index.html" aria-label="Back to Aster landing page">
+      <img src="../assets/img/mark_light.svg" width="36" height="36" alt="" />
+      <div class="wordmark">
+        <span>Docs</span>
+        <span>Aster</span>
+      </div>
+    </a>
+    <div class="header-actions">
+
+      <button class="nav-toggle" data-nav-toggle aria-expanded="false" aria-label="Toggle navigation">
+        Menu
+      </button>
+
+      <nav class="nav" data-nav aria-label="Primary">
+        <a href="../index.html#graphs">Why</a>
+        <a href="../index.html#how">How Aster works</a>
+        <a href="../index.html#pub-contact">Publications & Contact</a>
+        <a class="cta" href="index.html">Docs</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main class="docs">
+  <div class="container docs-grid">
+
+    <aside class="sidebar" aria-label="Documentation navigation">
+      <div class="sidebar-title">Documentation</div>
+      <nav class="side-nav">
+        <a href="installation.html">Installation</a>
+        <a href="index.html">Quick Start</a>
+        <a href="features.html">Key Features</a>
+        <a class="active" href="api.html">API &amp; Examples</a>
+        <a href="benchmarks.html">Benchmarks</a>
+      </nav>
+    </aside>
+
+    <article class="doc-content">
+      <h1>API &amp; Examples</h1>
+      <p>
+        Aster’s public graph interface is exposed in <code>include/rocksdb/graph.h</code>.
+        The main abstraction is <code>RocksGraph</code>, which wraps RocksDB with graph-aware storage,
+        update policies, adjacency encoding, degree estimation, and property support.
+      </p>
+
+      <h2>Where the API lives</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Main entry points</h3>
+          <ul>
+            <li><code>include/rocksdb/graph.h</code> — public graph API</li>
+            <li><code>db/graph.cc</code> — implementation</li>
+            <li><code>graph_test/graph_benchmark_new.h</code> — examples and validation paths</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Storage context</h3>
+          <ul>
+            <li>Adjacency lists live in the default graph storage layer</li>
+            <li>Vertex properties live in <code>vprop_val</code></li>
+            <li>Edge properties live in <code>eprop_val</code></li>
+            <li>Graph metadata persists vertex and edge counts</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Core types</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Identifiers</h3>
+          <ul>
+            <li><code>node_id_t</code> — 64-bit integer vertex identifier</li>
+            <li><code>edge_id_t</code> — 64-bit integer edge identifier</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Returned structures</h3>
+          <ul>
+            <li><code>Edges</code> stores outgoing and incoming neighbors</li>
+            <li><code>Property</code> stores a <code>name</code> and a <code>value</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:14px;">
+        The API is designed so the same storage engine can expose graph mutation, graph lookup,
+        property storage, traversal, and diagnostic hooks from one interface.
+      </div>
+
+      <h2>Open a graph</h2>
+      <p>
+        A typical setup creates a <code>RocksGraph</code> instance with RocksDB options plus
+        an update policy, an encoding type, and a database path.
+      </p>
+
+      <div class="card">
+    <pre class="mono">#include "rocksdb/graph.h"
+#include "rocksdb/options.h"
+
+rocksdb::Options options;
+// Configure RocksDB options here if needed.
+
+rocksdb::RocksGraph graph(
+    options,
+    EDGE_UPDATE_ADAPTIVE,
+    ENCODING_TYPE_NONE,
+    true,
+    "/tmp/aster-demo"
+);</pre>
+      </div>
+
+      <h2>Core graph API</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Structure and mutation</h3>
+          <ul>
+            <li><code>AddVertex(node_id_t id)</code></li>
+            <li><code>AddEdge(node_id_t from, node_id_t to)</code></li>
+            <li><code>DeleteEdge(node_id_t from, node_id_t to)</code></li>
+            <li><code>AddEdges(...)</code></li>
+            <li><code>AddVertexForBulkLoad()</code></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Read and count</h3>
+          <ul>
+            <li><code>GetAllEdges(node_id_t src, Edges* edges)</code></li>
+            <li><code>CountVertex()</code></li>
+            <li><code>CountEdge()</code></li>
+            <li><code>GetOutDegree(node_id_t id)</code></li>
+            <li><code>GetInDegree(node_id_t id)</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Minimal graph example</h2>
+      <p>
+        This mirrors the same basic flow used by the tiny example in <code>graph_test</code>:
+        add vertices, add edges, read neighbors, then delete one edge.
+      </p>
+
+      <div class="card">
+    <pre class="mono">rocksdb::node_id_t u = 1, v = 2, w = 3;
+
+graph.AddVertex(u);
+graph.AddVertex(v);
+graph.AddVertex(w);
+
+graph.AddEdge(u, v);
+graph.AddEdge(u, w);
+
+rocksdb::Edges edges;
+if (graph.GetAllEdges(u, &amp;edges).ok()) {
+  for (uint32_t i = 0; i &lt; edges.num_edges_out; ++i) {
+    std::cout &lt;&lt; edges.nxts_out[i].nxt &lt;&lt; "\n";
+  }
+  free_edges(&amp;edges);
+}
+
+graph.DeleteEdge(u, v);</pre>
+      </div>
+
+      <h2>Properties API</h2>
+      <p>
+        Aster supports both vertex properties and edge properties, along with reverse lookup helpers
+        for matching vertices or edges by property.
+      </p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Write and read properties</h3>
+          <ul>
+            <li><code>AddVertexProperty(node_id_t id, Property prop)</code></li>
+            <li><code>AddEdgeProperty(node_id_t from, node_id_t to, Property prop)</code></li>
+            <li><code>GetVertexProperty(node_id_t id, std::vector&lt;Property&gt;&amp; props)</code></li>
+            <li><code>GetEdgeProperty(node_id_t from, node_id_t to, std::vector&lt;Property&gt;&amp; props)</code></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Reverse lookup helpers</h3>
+          <ul>
+            <li><code>GetVerticesWithProperty(Property prop)</code></li>
+            <li><code>GetEdgesWithProperty(Property prop)</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Property example</h2>
+      <div class="card">
+    <pre class="mono">rocksdb::Property vp{.name = "kind", .value = "paper"};
+graph.AddVertexProperty(u, vp);
+
+std::vector&lt;rocksdb::Property&gt; vprops;
+graph.GetVertexProperty(u, vprops);
+
+rocksdb::Property ep{.name = "weight", .value = "1"};
+graph.AddEdgeProperty(u, w, ep);
+
+std::vector&lt;rocksdb::Property&gt; eprops;
+graph.GetEdgeProperty(u, w, eprops);
+
+auto matched = graph.GetVerticesWithProperty(vp);</pre>
+      </div>
+
+      <h2>Policies, encoding, and degree estimation</h2>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Update policy</h3>
+          <ul>
+            <li><code>0</code> = <code>EDGE_UPDATE_EAGER</code></li>
+            <li><code>1</code> = <code>EDGE_UPDATE_LAZY</code></li>
+            <li><code>2</code> = <code>EDGE_UPDATE_ADAPTIVE</code></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Encoding</h3>
+          <ul>
+            <li><code>0</code> = <code>ENCODING_TYPE_NONE</code></li>
+            <li><code>1</code> = <code>ENCODING_TYPE_EFP</code></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Degree estimation</h3>
+          <ul>
+            <li><code>GetOutDegree()</code> / <code>GetInDegree()</code> — exact</li>
+            <li><code>GetDegreeApproximate()</code> — approximate</li>
+            <li><code>FILTER_TYPE_CMS</code> and <code>FILTER_TYPE_MORRIS</code> are supported</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:14px;">
+        The same knobs exposed by <code>graph_example</code> map directly to the API-level policy
+        and encoding choices, so CLI experiments and embedded usage stay aligned.
+      </div>
+
+      <h2>Traversal and diagnostics</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Traversal</h3>
+          <ul>
+            <li><code>SimpleWalk(node_id_t start, float decay_factor)</code></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Diagnostics</h3>
+          <ul>
+            <li><code>GetRocksDBStats(std::string&amp; stat)</code></li>
+            <li><code>printLSM(int column)</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Where these APIs are already exercised</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Tiny graph flow</h3>
+          <p>
+            The tiny example exercises the basic path:
+            <code>AddVertex</code> → <code>AddEdge</code> → <code>GetAllEdges</code> → <code>DeleteEdge</code>.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Property and validation tests</h3>
+          <p>
+            The repository also includes property tests, degree-sketch evaluation,
+            mixed workloads, and replay-based execution paths under <code>graph_test</code>.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:14px;">
+        Read this page as the interface map, then open <code>graph.h</code> for declarations
+        and <code>graph_benchmark_new.h</code> for concrete usage patterns.
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="footer-title">Aster Docs</div>
+      <div>Installation • Quick Start • Key Features • API • Benchmarks</div>
+    </div>
+    <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+      <a href="../index.html">Landing</a>
+      <a href="index.html">Docs</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

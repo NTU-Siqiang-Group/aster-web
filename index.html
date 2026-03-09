@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="Aster: a RocksDB-based graph database for large-scale, evolving graphs."/>
+  <title>Aster — Poly‑LSM for Evolving Graphs</title>
+  <link rel="stylesheet" href="assets/css/main.css"/>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="#top" aria-label="Aster home">
+      <img src="assets/img/mark_light.svg" width="36" height="36" alt="An evolving graph growing denser over time." />
+      <div class="wordmark">
+        <span>Project</span>
+        <span>Aster</span>
+      </div>
+    </a>
+    <div class="header-actions">
+
+      <button class="nav-toggle" data-nav-toggle aria-expanded="false" aria-label="Toggle navigation">
+        Menu
+      </button>
+
+      <nav class="nav" data-nav aria-label="Primary">
+        <a href="#graphs">Why</a>
+        <a href="#how">How Aster works</a>
+        <a href="#pub-contact">Publications &amp; Contact</a>
+        <a class="cta" href="docs/index.html">Docs</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="kicker">
+          <span>ACM SIGMOD 2025</span>
+          <span style="opacity:.35">•</span>
+          <span>Built on RocksDB</span>
+        </div>
+
+        <h1 class="h1">
+          <span class="headline-row">
+            <span class="accent">Update</span> fast.
+            <span class="accent">Lookup</span> fast.
+          </span>
+          <br />
+          <span class="accent">Aster</span> does both.
+        </h1>
+
+        <p class="subhead">
+          Aster’s Poly‑LSM is designed for evolving graphs where updates and neighbor queries both matter.
+        </p>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <img src="assets/img/evgraph.svg" alt="" style="width:100%; height:auto; display:block;"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section id="graphs" class="section">
+    <div class="container">
+      <h2 class="section-title">Graphs are <span class="accent">everywhere</span></h2>
+      <p class="section-lead">
+        A graph is a simple way to represent relationships: things (nodes) connected by links (edges). <br />
+        It shows up in social networks, recommendations, and knowledge graphs. <br />
+        And in the real world, these graphs don’t sit still—they <strong>evolve</strong>.
+      </p>
+
+      <div class="graph-strip">
+        <img
+          src="assets/img/trigraph2.png"
+          alt="Three example graph types: social graph, user-item graph, and knowledge graph"
+        />
+      </div>
+
+      <div style="height:14px"></div>
+      <div class="callout">
+        Modern graphs can reach <strong>millions to billions</strong> of relationships—and they keep changing.
+        That combination is what makes storage hard.
+      </div>
+
+      <div style="height:56px"></div>
+
+      <h2 class="section-title">Evolving graphs need <span class="accent">three</span> things at once</h2>
+      <p class="section-lead">
+        Online graph workloads constantly mix small updates with neighbor lookups.<br />
+        Doing both at scale means a system has to do three things well: updates, lookups, and scalability.
+      </p>
+
+
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-head">
+            <img class="card-icon" src="assets/img/icon-1.png" alt="" />
+            <h3>Fast updates</h3>
+          </div>
+          <p>Add and delete edges quickly, even under heavy write pressure.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <img class="card-icon" src="assets/img/icon-2.png" alt="" />
+            <h3>Fast lookups</h3>
+          </div>
+          <p>Return neighbors with low latency—repeatedly—under mixed read/write workloads.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <img class="card-icon" src="assets/img/icon-3.png" alt="" />
+            <h3>Scale on disk</h3>
+          </div>
+          <p>When the graph outgrows memory, the disk layout dominates performance.</p>
+        </div>
+      </div>
+
+
+
+
+      <div style="height:16px"></div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Why this is tricky</h3>
+          <p>
+            Some layouts make updates fast but slow down reads. Others make reads fast but make updates expensive.
+            As the graph grows, these trade-offs become painful.
+          </p>
+        </div>
+        <div class="card">
+          <h3>No single “best” structure</h3>
+          <p>
+            Low-degree and high-degree vertices behave differently. Read-heavy and write-heavy workloads do too.
+            A fixed layout struggles somewhere.
+          </p>
+        </div>
+      </div>
+
+      <div style="height:14px"></div>
+      <div class="callout">
+        The goal is simple to say and hard to deliver:
+        <strong>fast updates</strong> + <strong>fast lookups</strong> + <strong>scalability</strong>.
+      </div>
+    </div>
+  </section>
+
+  <!-- ASTER + POLY-LSM -->
+  <section id="how" class="section">
+    <div class="container">
+      <h2 class="section-title">
+        Aster’s answer: <span class="accent">Poly‑LSM</span> for evolving graphs
+      </h2>
+
+      <p class="section-lead">
+        Aster is built on RocksDB because LSM-trees handle lots of small updates efficiently on disk.<br />
+        Vertex-based LSM-trees favor lookups, while edge-based LSM-trees favor updates.<br />
+        Aster proposes <strong>Poly‑LSM</strong>, which adaptively chooses between the two based on node degree and workload.
+      </p>
+
+      <div class="diagram" style="margin-top: 28px;">
+        <img
+          src="assets/img/polylsm.svg"
+          alt="Poly-LSM"
+          style="width:100%; height:auto; display:block;"
+        />
+      </div>
+
+      <div style="height: 56px;"></div>
+
+      <h2 class="section-title">
+        How <span class="accent">Aster</span> adapts to your workload
+      </h2>
+      <p class="section-lead">
+        Move the sliders for an intuition-level view of how Aster changes its behavior across different workloads.
+      </p>
+
+
+      <div class="demo-widget" data-demo>
+        <div class="demo-controls">
+          <div class="control">
+            <label>
+              <span>How often does the graph change?</span>
+              <span data-change-val>—</span>
+            </label>
+            <input data-change type="range" min="0" max="100" value="45" step="1"/>
+            <div class="hint">0% = mostly reads • 100% = mostly writes</div>
+          </div>
+
+          <div class="control">
+            <label>
+              <span>How many neighbors does this node have?</span>
+              <span data-popularity-val>—</span>
+            </label>
+            <input data-popularity type="range" min="0" max="1000" value="120" step="1"/>
+            <div class="hint">0 = isolated • 1000 = highly connected</div>
+          </div>
+        </div>
+
+        <div class="demo-output card">
+          <div class="label">Decision</div>
+          <div class="decision" data-decision>Aster would …</div>
+          <div class="explain" data-explain></div>
+          <div class="mini-note">
+            Higher-degree nodes are more expensive to rewrite, so Aster balances update cost against lookup speed.
+          </div>
+        </div>
+      </div>
+
+
+
+      <div style="height:24px"></div>
+
+      <h3 style="margin: 0 0 10px; font-size: 18px; letter-spacing: -.01em;">Results at a glance</h3>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Up to 17× throughput</h3>
+          <p>On a billion-scale Twitter graph dataset, Aster reports up to 17× throughput improvement over strong baselines.</p>
+        </div>
+        <div class="card">
+          <h3>Robust under mixed workloads</h3>
+          <p>Adaptive updates help performance stay stable across different read/write mixes—without hand-tuning one “best” layout.</p>
+        </div>
+        <div class="card">
+          <h3>Designed for disk</h3>
+          <p>Poly‑LSM controls I/O with compact representation and background consolidation for disk-resident graphs.</p>
+        </div>
+      </div>
+
+  </section>
+
+
+  <!-- PUBLICATIONS & CONTACT -->
+  <section id="pub-contact" class="section">
+    <div class="container">
+      <h2 class="section-title" style="margin-bottom: 24px;">Publications &amp; Contact</h2>
+
+      <!--
+      <div class="grid-2">
+        <div class="card">
+          <h3>Aster: Enhancing LSM-structures for Scalable Graph Database</h3>
+          <p>
+            Dingheng Mo, Junfeng Liu, Fan Wang, and Siqiang Luo.
+            Proc. ACM Manag. Data 3, 1 (SIGMOD), Article 12 (Feb 2025).
+            DOI: 10.1145/3709662
+          </p>
+        </div>
+        <div class="card">
+          <h3>BibTeX</h3>
+          <p class="mono">
+@article{mo2025aster,
+  title   = {Aster: Enhancing LSM-structures for Scalable Graph Database},
+  author  = {Mo, Dingheng and Liu, Junfeng and Wang, Fan and Luo, Siqiang},
+  journal = {Proc. ACM Manag. Data},
+  year    = {2025},
+  doi     = {10.1145/3709662}
+}
+          </p>
+        </div>
+      </div>
+      --> 
+      <div class="card">
+        <h3>Aster: Enhancing LSM-structures for Scalable Graph Database</h3>
+        <p>
+          Dingheng Mo, Junfeng Liu, Fan Wang, and Siqiang Luo.
+          Proc. ACM Manag. Data 3, 1 (SIGMOD), Article 12 (Feb 2025).
+          DOI: 10.1145/3709662
+        </p>
+      </div>
+
+      <div style="height: 28px;"></div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>GitHub</h3>
+          <p>
+            Repository: <a href="#" style="text-decoration: underline;">(add link)</a><br/>
+            Issues: <a href="#" style="text-decoration: underline;">(add link)</a>
+          </p>
+        </div>
+        <div class="card">
+          <h3>Email</h3>
+          <p>
+            Maintainers:
+            <a href="mailto:maintainers@example.com" style="text-decoration: underline;">
+              maintainers@example.com
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="footer-title">Aster</div>
+      <div>Poly‑LSM for evolving graphs • Built on RocksDB</div>
+    </div>
+    <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+      <a href="#graphs">Why</a>
+      <a href="#how">How Aster works</a>
+      <a href="#pub-contact">Publications &amp; Contact</a>
+      <a href="docs/index.html">Docs</a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

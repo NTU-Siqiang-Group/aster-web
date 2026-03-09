@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="Aster documentation: Quick Start"/>
+  <title>Aster Docs — Quick Start</title>
+  <link rel="stylesheet" href="../assets/css/main.css"/>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="../index.html" aria-label="Back to Aster landing page">
+      <img src="../assets/img/mark_light.svg" width="36" height="36" alt="" />
+      <div class="wordmark">
+        <span>Docs</span>
+        <span>Aster</span>
+      </div>
+    </a>
+    <div class="header-actions">
+
+      <button class="nav-toggle" data-nav-toggle aria-expanded="false" aria-label="Toggle navigation">
+        Menu
+      </button>
+
+      <nav class="nav" data-nav aria-label="Primary">
+        <a href="../index.html#graphs">Why</a>
+        <a href="../index.html#how">How Aster works</a>
+        <a href="../index.html#pub-contact">Publications & Contact</a>
+        <a class="cta" href="index.html">Docs</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main class="docs">
+  <div class="container docs-grid">
+
+    <aside class="sidebar" aria-label="Documentation navigation">
+      <div class="sidebar-title">Documentation</div>
+      <nav class="side-nav">
+        <a href="installation.html">Installation</a>
+        <a class="active" href="index.html">Quick Start</a>
+        <a href="features.html">Key Features</a>
+        <a href="api.html">API &amp; Examples</a>
+        <a href="benchmarks.html">Benchmarks</a>
+      </nav>
+    </aside>
+
+    <article class="doc-content">
+      <h1>Quick Start</h1>
+      <p>
+        The fastest way to try Aster is the <code>graph_test/graph_example.cc</code> driver.
+        This page follows the repository’s shortest build-and-run path, then shows how to move from the tiny example
+        to larger random and power-law graphs.
+      </p>
+
+      <h2>Build</h2>
+      <div class="card">
+        <p class="mono">make static_lib</p>
+        <p class="mono">cd graph_test/ &amp;&amp; make all</p>
+        <p class="mono">./graph_example --load_mode=tiny</p>
+      </div>
+
+      <p>
+        The example driver lives in <code>graph_test/graph_example.cc</code>, and most helper workloads and tests live in
+        <code>graph_test/graph_benchmark_new.h</code>.
+      </p>
+
+      <h2>Run the smallest end-to-end example</h2>
+      <p>
+        In code, <code>--load_mode=tiny</code> dispatches to <code>TinyExample()</code>.
+        That routine adds vertices <code>1</code>, <code>2</code>, and <code>3</code>, inserts edges
+        <code>1 → 2</code> and <code>1 → 3</code>, prints the outgoing edges of vertex <code>1</code>,
+        deletes edge <code>1 → 2</code>, and prints the adjacency again.
+      </p>
+
+      <div class="card">
+        <p class="mono">./graph_example --load_mode=tiny</p>
+      </div>
+
+      <p>
+        A successful run should show the neighbors of vertex <code>1</code>, then show one fewer edge after the delete.
+      </p>
+
+      <div class="callout">
+        By default, <code>--reinit=true</code>, so the existing DB is destroyed before each run.
+      </div>
+
+      <h2>Try a larger random graph</h2>
+      <p>
+        <code>random</code> mode calls <code>LoadRandomGraph(load_vertices, load_edges)</code>.
+        If you also set <code>--run_lookups=true</code>, the driver follows the load with random adjacency lookups and
+        prints average <code>put latency</code> and <code>get latency</code>.
+      </p>
+
+      <div class="card">
+        <p class="mono">./graph_example --load_mode=random --load_vertices=20000 --load_edges=200000 --run_lookups=true --lookup_count=100</p>
+      </div>
+
+      <div class="callout" style="margin-top:14px;">
+        <code>--run_lookups=true</code> tells the driver to run random neighbor lookups after loading the graph.<br />
+        <code>--lookup_count</code> sets how many lookups to run. For example,
+        <code>--lookup_count=200</code> means the program will sample 200 vertices and read their adjacency lists. <br />
+        By default, <code>--run_lookups=false</code> and <code>--lookup_count=100</code>, so the program only loads the graph unless you explicitly enable lookups.
+      </div>
+
+      <h2>Try a skewed graph</h2>
+      <p>
+        <code>powerlaw</code> mode calls <code>LoadPowerLawGraphNew(load_vertices, powerlaw_alpha)</code>.
+        This is a good next step after the uniform random loader because it gives you a more skewed degree distribution.
+      </p>
+
+      <div class="card">
+        <p class="mono">./graph_example --load_mode=powerlaw --load_vertices=20000 --powerlaw_alpha=2.0 --run_lookups=true --lookup_count=100</p>
+      </div>
+
+      <div class="callout" style="margin-top:14px;">
+        <code>--powerlaw_alpha</code> controls how skewed the degree distribution is.
+        Smaller values usually create a more hub-heavy graph, while larger values make the distribution less extreme.
+      </div>
+
+      <h2>Main knobs to try first</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Graph shape and workload</h3>
+          <ul>
+            <li><code>--load_mode=tiny|random|powerlaw</code></li>
+            <li><code>--load_vertices</code> / <code>--load_edges</code></li>
+            <li><code>--powerlaw_alpha</code></li>
+            <li><code>--run_lookups</code> / <code>--lookup_count</code></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Storage and execution</h3>
+          <ul>
+            <li><code>--update_policy=0|1|2</code> → eager / lazy / adaptive</li>
+            <li><code>--encoding_type=0|1</code> → none / EFP</li>
+            <li><code>--is_directed=true|false</code></li>
+            <li><code>--reinit=true|false</code></li>
+            <li><code>--enable_bloom_filter</code> / <code>--direct_io</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Defaults</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Runtime defaults</h3>
+          <ul>
+            <li><code>--load_mode=tiny</code></li>
+            <li><code>--is_directed=true</code></li>
+            <li><code>--enable_bloom_filter=true</code></li>
+            <li><code>--direct_io=false</code></li>
+            <li><code>--reinit=true</code></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Workload defaults</h3>
+          <ul>
+            <li><code>--run_lookups=false</code></li>
+            <li><code>--lookup_count=100</code></li>
+            <li><code>--load_vertices=20000</code></li>
+            <li><code>--load_edges=200000</code></li>
+            <li><code>--powerlaw_alpha=2.0</code></li>
+          </ul>
+        </div>
+      </div>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="footer-title">Aster Docs</div>
+      <div>Installation • Quick Start • Key Features • API • Benchmarks</div>
+    </div>
+    <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+      <a href="../index.html">Landing</a>
+      <a href="index.html">Docs</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

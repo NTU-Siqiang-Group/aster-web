@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 775" width="2048" height="775" fill="none">
+  <defs>
+    <marker id="arrow" markerWidth="18" markerHeight="18" refX="15" refY="9" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M2 2 L16 9 L2 16" fill="none" stroke="#111111" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <line x1="330" y1="595" x2="430" y2="545" stroke="#111111" stroke-width="6" stroke-linecap="round" fill="none" marker-end="url(#arrow)"/>
+  <line x1="790" y1="420" x2="870" y2="420" stroke="#111111" stroke-width="6" stroke-linecap="round" fill="none" marker-end="url(#arrow)"/>
+  <line x1="1330" y1="380" x2="1415" y2="365" stroke="#111111" stroke-width="6" stroke-linecap="round" fill="none" marker-end="url(#arrow)"/>
+  <g id="s1" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="67" y1="568" x2="65" y2="678" stroke="#111111" stroke-width="6"/>
+    <line x1="67" y1="568" x2="215" y2="715" stroke="#111111" stroke-width="6"/>
+    <line x1="65" y1="678" x2="207" y2="509" stroke="#111111" stroke-width="6"/>
+    <line x1="65" y1="678" x2="275" y2="603" stroke="#111111" stroke-width="6"/>
+    <line x1="207" y1="509" x2="275" y2="603" stroke="#111111" stroke-width="6"/>
+    <line x1="275" y1="603" x2="215" y2="715" stroke="#111111" stroke-width="6"/>
+    <circle cx="67" cy="568" r="26" fill="#7ea5c9" stroke="#111111" stroke-width="6"/>
+    <circle cx="65" cy="678" r="26" fill="#7ea5c9" stroke="#111111" stroke-width="6"/>
+    <circle cx="207" cy="509" r="25" fill="#9eb9d2" stroke="#111111" stroke-width="6"/>
+    <circle cx="275" cy="603" r="26" fill="#b7d4cf" stroke="#111111" stroke-width="6"/>
+    <circle cx="215" cy="715" r="26" fill="#aed0c3" stroke="#111111" stroke-width="6"/>
+  </g>
+  <g id="s2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="505" y1="392" x2="505" y2="519" stroke="#111111" stroke-width="6"/>
+    <line x1="505" y1="392" x2="652" y2="317" stroke="#111111" stroke-width="6"/>
+    <line x1="505" y1="392" x2="671" y2="562" stroke="#111111" stroke-width="6"/>
+    <line x1="505" y1="519" x2="652" y2="317" stroke="#111111" stroke-width="6"/>
+    <line x1="505" y1="519" x2="671" y2="562" stroke="#111111" stroke-width="6"/>
+    <line x1="652" y1="317" x2="730" y2="429" stroke="#111111" stroke-width="6"/>
+    <line x1="730" y1="429" x2="671" y2="562" stroke="#111111" stroke-width="6"/>
+    <circle cx="505" cy="392" r="30" fill="#4d79a7" stroke="#111111" stroke-width="6"/>
+    <circle cx="505" cy="519" r="25" fill="#9eb9d2" stroke="#111111" stroke-width="6"/>
+    <circle cx="652" cy="317" r="29" fill="#9eb9d2" stroke="#111111" stroke-width="6"/>
+    <circle cx="730" cy="429" r="26" fill="#aed0c3" stroke="#111111" stroke-width="6"/>
+    <circle cx="671" cy="562" r="29" fill="#d8b36c" stroke="#111111" stroke-width="6"/>
+  </g>
+  <g id="s3" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="910" y1="410" x2="1010" y2="271" stroke="#111111" stroke-width="6"/>
+    <line x1="910" y1="410" x2="995" y2="550" stroke="#111111" stroke-width="6"/>
+    <line x1="1010" y1="271" x2="995" y2="550" stroke="#111111" stroke-width="6"/>
+    <line x1="1010" y1="271" x2="1210" y2="218" stroke="#111111" stroke-width="6"/>
+    <line x1="1010" y1="271" x2="1276" y2="403" stroke="#111111" stroke-width="6"/>
+    <line x1="1010" y1="271" x2="1183" y2="620" stroke="#111111" stroke-width="6"/>
+    <line x1="995" y1="550" x2="1210" y2="218" stroke="#111111" stroke-width="6"/>
+    <line x1="995" y1="550" x2="1276" y2="403" stroke="#111111" stroke-width="6"/>
+    <line x1="995" y1="550" x2="1183" y2="620" stroke="#111111" stroke-width="6"/>
+    <line x1="1210" y1="218" x2="1276" y2="403" stroke="#111111" stroke-width="6"/>
+    <line x1="1210" y1="218" x2="1183" y2="620" stroke="#111111" stroke-width="6"/>
+    <line x1="1276" y1="403" x2="1183" y2="620" stroke="#111111" stroke-width="6"/>
+    <circle cx="910" cy="410" r="24" fill="#9eb9d2" stroke="#111111" stroke-width="6"/>
+    <circle cx="1010" cy="271" r="37" fill="#aed0c3" stroke="#111111" stroke-width="6"/>
+    <circle cx="995" cy="550" r="43" fill="#7ea5c9" stroke="#111111" stroke-width="6"/>
+    <circle cx="1210" cy="218" r="32" fill="#d8b36c" stroke="#111111" stroke-width="6"/>
+    <circle cx="1276" cy="403" r="49" fill="#dd7b27" stroke="#111111" stroke-width="6"/>
+    <circle cx="1183" cy="620" r="28" fill="#7ea5c9" stroke="#111111" stroke-width="6"/>
+  </g>
+  <g id="s4" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="1489" y1="155" x2="1463" y2="370" stroke="#111111" stroke-width="6"/>
+    <line x1="1489" y1="155" x2="1715" y2="65" stroke="#111111" stroke-width="6"/>
+    <line x1="1463" y1="370" x2="1489" y2="531" stroke="#111111" stroke-width="6"/>
+    <line x1="1463" y1="370" x2="1538" y2="231" stroke="#111111" stroke-width="6"/>
+    <line x1="1463" y1="370" x2="1696" y2="363" stroke="#111111" stroke-width="6"/>
+    <line x1="1489" y1="531" x2="1538" y2="231" stroke="#111111" stroke-width="6"/>
+    <line x1="1489" y1="531" x2="1705" y2="657" stroke="#111111" stroke-width="6"/>
+    <line x1="1489" y1="531" x2="1809" y2="479" stroke="#111111" stroke-width="6"/>
+    <line x1="1489" y1="531" x2="1889" y2="590" stroke="#111111" stroke-width="6"/>
+    <line x1="1538" y1="231" x2="1715" y2="65" stroke="#111111" stroke-width="6"/>
+    <line x1="1538" y1="231" x2="1696" y2="363" stroke="#111111" stroke-width="6"/>
+    <line x1="1538" y1="231" x2="1921" y2="149" stroke="#111111" stroke-width="6"/>
+    <line x1="1715" y1="65" x2="1696" y2="363" stroke="#111111" stroke-width="6"/>
+    <line x1="1715" y1="65" x2="1809" y2="263" stroke="#111111" stroke-width="6"/>
+    <line x1="1715" y1="65" x2="1921" y2="149" stroke="#111111" stroke-width="6"/>
+    <line x1="1696" y1="363" x2="1705" y2="657" stroke="#111111" stroke-width="6"/>
+    <line x1="1696" y1="363" x2="1809" y2="263" stroke="#111111" stroke-width="6"/>
+    <line x1="1696" y1="363" x2="1809" y2="479" stroke="#111111" stroke-width="6"/>
+    <line x1="1696" y1="363" x2="1979" y2="369" stroke="#111111" stroke-width="6"/>
+    <line x1="1705" y1="657" x2="1809" y2="479" stroke="#111111" stroke-width="6"/>
+    <line x1="1705" y1="657" x2="1889" y2="590" stroke="#111111" stroke-width="6"/>
+    <line x1="1809" y1="263" x2="1921" y2="149" stroke="#111111" stroke-width="6"/>
+    <line x1="1809" y1="263" x2="1979" y2="369" stroke="#111111" stroke-width="6"/>
+    <line x1="1809" y1="479" x2="1889" y2="590" stroke="#111111" stroke-width="6"/>
+    <line x1="1809" y1="479" x2="1979" y2="369" stroke="#111111" stroke-width="6"/>
+    <line x1="1889" y1="590" x2="1979" y2="369" stroke="#111111" stroke-width="6"/>
+    <line x1="1921" y1="149" x2="1979" y2="369" stroke="#111111" stroke-width="6"/>
+    <circle cx="1489" cy="155" r="33" fill="#4d79a7" stroke="#111111" stroke-width="6"/>
+    <circle cx="1463" cy="370" r="31" fill="#7ea5c9" stroke="#111111" stroke-width="6"/>
+    <circle cx="1489" cy="531" r="32" fill="#7ea5c9" stroke="#111111" stroke-width="6"/>
+    <circle cx="1538" cy="231" r="37" fill="#aed0c3" stroke="#111111" stroke-width="6"/>
+    <circle cx="1715" cy="65" r="29" fill="#e4ab7a" stroke="#111111" stroke-width="6"/>
+    <circle cx="1696" cy="363" r="41" fill="#90995f" stroke="#111111" stroke-width="6"/>
+    <circle cx="1705" cy="657" r="38" fill="#90a893" stroke="#111111" stroke-width="6"/>
+    <circle cx="1809" cy="263" r="28" fill="#dd7b27" stroke="#111111" stroke-width="6"/>
+    <circle cx="1809" cy="479" r="27" fill="#9b9669" stroke="#111111" stroke-width="6"/>
+    <circle cx="1889" cy="590" r="32" fill="#90995f" stroke="#111111" stroke-width="6"/>
+    <circle cx="1921" cy="149" r="38" fill="#efb67c" stroke="#111111" stroke-width="6"/>
+    <circle cx="1979" cy="369" r="30" fill="#efb67c" stroke="#111111" stroke-width="6"/>
+  </g>
+</svg>
