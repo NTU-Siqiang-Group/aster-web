@@ -46,9 +46,8 @@
     }
 
     function labelChange(v) {
-      if (v <= 20) return 'mostly reads';
-      if (v <= 50) return 'mixed';
-      if (v <= 80) return 'write-heavy';
+      if (v <= 30) return 'mostly reads';
+      if (v <= 70) return 'mixed';
       return 'mostly writes';
     }
 

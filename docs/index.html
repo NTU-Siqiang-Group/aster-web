@@ -101,15 +101,22 @@
 
       <div class="callout" style="margin-top:14px;">
         <code>--run_lookups=true</code> tells the driver to run random neighbor lookups after loading the graph.<br />
-        <code>--lookup_count</code> sets how many lookups to run. For example,
-        <code>--lookup_count=200</code> means the program will sample 200 vertices and read their adjacency lists. <br />
+      </div>
+
+      <div class="callout" style="margin-top:14px;">
+        <code>--lookup_count</code> sets how many lookups to run. 
+        For example, <code>--lookup_count=200</code> means the program will sample 200 vertices and read their adjacency lists. <br />
+      </div>
+
+      <div class="callout" style="margin-top:14px;">
         By default, <code>--run_lookups=false</code> and <code>--lookup_count=100</code>, so the program only loads the graph unless you explicitly enable lookups.
       </div>
 
-      <h2>Try a skewed graph</h2>
+
+      <h2>Try a graph with hub nodes</h2>
       <p>
         <code>powerlaw</code> mode calls <code>LoadPowerLawGraphNew(load_vertices, powerlaw_alpha)</code>.
-        This is a good next step after the uniform random loader because it gives you a more skewed degree distribution.
+        This is a good next step after the uniform random loader because it creates a graph where a few nodes have many more connections than others.
       </p>
 
       <div class="card">
@@ -117,11 +124,11 @@
       </div>
 
       <div class="callout" style="margin-top:14px;">
-        <code>--powerlaw_alpha</code> controls how skewed the degree distribution is.
-        Smaller values usually create a more hub-heavy graph, while larger values make the distribution less extreme.
+        <code>--powerlaw_alpha</code> controls how unevenly connections are distributed across nodes. <br />
+        Smaller values create a few highly connected hub nodes, while larger values make connections more evenly distributed.
       </div>
 
-      <h2>Main knobs to try first</h2>
+      <h2>Main knobs</h2>
       <div class="grid-2">
         <div class="card">
           <h3>Graph shape and workload</h3>

@@ -52,16 +52,16 @@
             <span class="accent">Lookup</span> fast.
           </span>
           <br />
-          <span class="accent">Aster</span> does both.
+          <span class="accent">Aster:</span> graph-aware LSM.
         </h1>
 
         <p class="subhead">
-          Aster’s Poly‑LSM is designed for evolving graphs where updates and neighbor queries both matter.
+          Powered by Poly‑LSM, Aster adapts key‑value storage for evolving graphs, balancing frequent updates with efficient neighbor lookups.
         </p>
       </div>
 
       <div class="hero-visual" aria-hidden="true">
-        <img src="assets/img/evgraph.svg" alt="" style="width:100%; height:auto; display:block;"/>
+        <img src="assets/img/evgraph2.svg" alt="" style="width:100%; height:auto; display:block;"/>
       </div>
     </div>
   </section>
@@ -159,18 +159,16 @@
   <section id="how" class="section">
     <div class="container">
       <h2 class="section-title">
-        Aster’s answer: <span class="accent">Poly‑LSM</span> for evolving graphs
+        Poly‑LSM: <span class="accent">graph‑oriented key‑value storage</span> for evolving graphs
       </h2>
 
       <p class="section-lead">
-        Aster is built on RocksDB because LSM-trees handle lots of small updates efficiently on disk.<br />
-        Vertex-based LSM-trees favor lookups, while edge-based LSM-trees favor updates.<br />
-        Aster proposes <strong>Poly‑LSM</strong>, which adaptively chooses between the two based on node degree and workload.
+        Built on RocksDB, Poly‑LSM stores graph data as polymorphic key‑value entries and adaptively switches between vertex‑based and edge‑based updates based on node degree and workload.
       </p>
 
       <div class="diagram" style="margin-top: 28px;">
         <img
-          src="assets/img/polylsm.svg"
+          src="assets/img/poly-lsm.png"
           alt="Poly-LSM"
           style="width:100%; height:auto; display:block;"
         />
