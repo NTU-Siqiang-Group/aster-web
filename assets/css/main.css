@@ -252,6 +252,29 @@ a:hover{ opacity:.95; }
   max-width: 78ch;
 }
 
+.section-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 10px 0 22px;
+  font-size: 0.95rem;
+  color: #7a7a7a;
+}
+
+.section-jump a {
+  color: #7a7a7a;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.section-jump a:hover {
+  color: #444;
+  border-bottom-color: #bdbdbd;
+}
+
+
+
 .grid-3{
   display:grid;
   grid-template-columns: repeat(3, 1fr);
@@ -565,7 +588,9 @@ a:hover{ opacity:.95; }
 /* Anchor offset for sticky header */
 .section{ scroll-margin-top: calc(var(--header-h) + 12px); }
 
-
+.doc-content h2[id]{
+  scroll-margin-top: calc(var(--header-h) + 12px);
+}
 
 
 
