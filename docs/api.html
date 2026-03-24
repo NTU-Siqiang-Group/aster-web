@@ -36,25 +36,52 @@
 <main class="docs">
   <div class="container docs-grid">
 
+    
+        <details class="docs-mobile-nav">
+          <summary aria-label="Open documentation navigation">
+            <span class="docs-mobile-current">API & Examples</span>
+            <span aria-hidden="true" class="docs-mobile-nav-toggle"></span>
+          </summary>
+          <div class="docs-mobile-panel">
+            <nav aria-label="Documentation navigation" class="side-nav">
+              <a data-doc-close href="installation.html">Installation</a>
+              <a data-doc-close href="index.html">Quick Start</a>
+              <a data-doc-close href="features.html">Key Features</a>
+              <div class="side-group">
+      <a class="active" aria-current="page" data-doc-close href="api.html">API &amp; Examples</a>
+      <div aria-label="API section shortcuts" class="side-subnav">
+        <a data-doc-close href="#data-model">Data Model &amp; Storage Layout</a>
+        <a data-doc-close href="#core-apis">Core graph APIs</a>
+        <a data-doc-close href="#property-apis">Properties APIs</a>
+        <a data-doc-close href="#other-apis">Other APIs</a>
+      </div>
+    </div>
+              <a data-doc-close href="benchmarks.html">Benchmarks</a>
+            </nav>
+          </div>
+        </details>
+
     <aside class="sidebar" aria-label="Documentation navigation">
       <div class="sidebar-title">Documentation</div>
       <nav class="side-nav">
         <a href="installation.html">Installation</a>
         <a href="index.html">Quick Start</a>
         <a href="features.html">Key Features</a>
-        <a class="active" href="api.html">API &amp; Examples</a>
+        <div class="side-group">
+  <a class="active" aria-current="page" href="api.html">API &amp; Examples</a>
+  <div aria-label="API section shortcuts" class="side-subnav">
+    <a href="#data-model">Data Model &amp; Storage Layout</a>
+    <a href="#core-apis">Core graph APIs</a>
+    <a href="#property-apis">Properties APIs</a>
+    <a href="#other-apis">Other APIs</a>
+  </div>
+</div>
         <a href="benchmarks.html">Benchmarks</a>
       </nav>
     </aside>
 
     <article class="doc-content">
       <h1>API &amp; Examples</h1>
-      <div class="section-jump" aria-label="On this page">
-        <a href="#data-model">Data Model &amp; Storage Layout</a>
-        <a href="#core-apis">Core graph APIs</a>
-        <a href="#property-apis">Properties APIs</a>
-        <a href="#other-apis">Other APIs</a>
-      </div>
       <p>
         Aster’s public graph interface is exposed in <code>include/rocksdb/graph.h</code>.
         The main abstraction is <code>RocksGraph</code>, which wraps RocksDB with graph-aware storage,
@@ -328,5 +355,45 @@ auto matched = graph.GetVerticesWithProperty(vp);</pre>
 </footer>
 
 <script src="../assets/js/main.js"></script>
+<script>
+  (() => {
+    const docsNavs = Array.from(document.querySelectorAll('.docs-mobile-nav'));
+    if (!docsNavs.length) return;
+
+    const closeAllDocsNavs = (except = null) => {
+      docsNavs.forEach((nav) => {
+        if (nav !== except) nav.open = false;
+      });
+    };
+
+    docsNavs.forEach((nav) => {
+      nav.addEventListener('toggle', () => {
+        if (nav.open) closeAllDocsNavs(nav);
+      });
+
+      nav.querySelectorAll('[data-doc-close]').forEach((link) => {
+        link.addEventListener('click', () => {
+          nav.open = false;
+        });
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      docsNavs.forEach((nav) => {
+        if (nav.open && !nav.contains(event.target)) {
+          nav.open = false;
+        }
+      });
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeAllDocsNavs();
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 820) closeAllDocsNavs();
+    });
+  })();
+</script>
 </body>
 </html>

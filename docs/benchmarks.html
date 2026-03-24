@@ -37,16 +37,33 @@
 <main class="docs">
   <div class="container docs-grid">
 
-    <aside class="sidebar" aria-label="Documentation navigation">
-      <div class="sidebar-title">Documentation</div>
-      <nav class="side-nav">
-        <a href="installation.html">Installation</a>
-        <a href="index.html">Quick Start</a>
-        <a href="features.html">Key Features</a>
-        <a href="api.html">API &amp; Examples</a>
-        <a class="active" href="benchmarks.html">Benchmarks</a>
-      </nav>
-    </aside>
+    
+    <details class="docs-mobile-nav">
+      <summary aria-label="Open documentation navigation">
+        <span class="docs-mobile-current">Benchmarks</span>
+        <span aria-hidden="true" class="docs-mobile-nav-toggle"></span>
+      </summary>
+      <div class="docs-mobile-panel">
+        <nav aria-label="Documentation navigation" class="side-nav">
+          <a data-doc-close href="installation.html">Installation</a>
+          <a data-doc-close href="index.html">Quick Start</a>
+          <a data-doc-close href="features.html">Key Features</a>
+          <a data-doc-close href="api.html">API &amp; Examples</a>
+          <a data-doc-close class="active" aria-current="page" href="benchmarks.html">Benchmarks</a>
+        </nav>
+      </div>
+    </details>
+
+<aside class="sidebar" aria-label="Documentation navigation">
+  <div class="sidebar-title">Documentation</div>
+  <nav class="side-nav">
+    <a href="installation.html">Installation</a>
+    <a href="index.html">Quick Start</a>
+    <a href="features.html">Key Features</a>
+    <a href="api.html">API &amp; Examples</a>
+    <a class="active" aria-current="page" href="benchmarks.html">Benchmarks</a>
+  </nav>
+</aside>
 
 
     <article class="doc-content">
@@ -76,5 +93,45 @@
 </footer>
 
 <script src="../assets/js/main.js"></script>
+<script>
+  (() => {
+    const docsNavs = Array.from(document.querySelectorAll('.docs-mobile-nav'));
+    if (!docsNavs.length) return;
+
+    const closeAllDocsNavs = (except = null) => {
+      docsNavs.forEach((nav) => {
+        if (nav !== except) nav.open = false;
+      });
+    };
+
+    docsNavs.forEach((nav) => {
+      nav.addEventListener('toggle', () => {
+        if (nav.open) closeAllDocsNavs(nav);
+      });
+
+      nav.querySelectorAll('[data-doc-close]').forEach((link) => {
+        link.addEventListener('click', () => {
+          nav.open = false;
+        });
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      docsNavs.forEach((nav) => {
+        if (nav.open && !nav.contains(event.target)) {
+          nav.open = false;
+        }
+      });
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeAllDocsNavs();
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 820) closeAllDocsNavs();
+    });
+  })();
+</script>
 </body>
 </html>

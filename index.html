@@ -26,7 +26,8 @@
 
       <nav class="nav" data-nav aria-label="Primary">
         <a href="#graphs">Why</a>
-        <a href="#how">How Aster works</a>
+        <a href="#how">Aster's Idea</a>
+        <a href="#demo">Aster in Action</a>
         <a href="#pub-contact">Publications &amp; Contact</a>
         <a class="cta" href="docs/index.html">Docs</a>
       </nav>
@@ -125,9 +126,6 @@
         </div>
       </div>
 
-
-
-
       <div style="height:16px"></div>
 
       <div class="grid-2">
@@ -155,27 +153,164 @@
     </div>
   </section>
 
-  <!-- ASTER + POLY-LSM -->
+
+  <!-- ASTER's IDEA -->
   <section id="how" class="section">
     <div class="container">
       <h2 class="section-title">
-        Poly‑LSM: <span class="accent">graph‑oriented key‑value storage</span> for evolving graphs
+        How <span class="accent">graph changes</span> are stored on disk
       </h2>
 
       <p class="section-lead">
-        Built on RocksDB, Poly‑LSM stores graph data as polymorphic key‑value entries and adaptively switches between vertex‑based and edge‑based updates based on node degree and workload.
+        Once a graph outgrows memory, every edge change has to land on disk.<br />
+        A <strong>key-value store</strong> gives a simple way to map an ID to its data, which helps storage scale.
       </p>
+
+      <p class="section-lead" style="margin-top:-12px;">
+        An <strong>LSM-tree</strong> is a disk-friendly way to handle many small changes: 
+        instead of rewriting the disk in place every time, it batches updates and reorganizes them in the background.
+      </p>
+
+      <p class="section-lead" style="margin-top:-12px; margin-bottom:28px;">
+        For graph data, that leads to one practical question: 
+        <strong>when one edge changes, should the system save only that small change, or rewrite the whole neighborhood?</strong>
+      </p>
+
+
+
+
+      
+      <h3 style="margin: 0 0 10px; font-size: 18px; letter-spacing: -.01em;">
+        Two ways to record one graph change
+      </h3>
+
+      <p class="section-lead" style="margin-bottom: 18px;">
+        Imagine one vertex’s neighbor list as a <strong>page</strong> in a notebook.<br />
+        When the graph changes, an LSM-backed key-value store can record that change in two different ways.
+      </p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head">
+            <img class="card-icon" src="assets/img/postit.png" alt="" />
+            <h3>Add a sticky note</h3>
+          </div>
+          <p>
+            Keep the original page and save only the new change as a small note.
+          </p>
+          <p><span class="pm pm-plus">(+) </span><strong>Update:</strong> Just add a note.</p>
+          <p><span class="pm pm-minus">(−) </span><strong>Lookup:</strong> Need to collect all the notes to see the full page.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <img class="card-icon" src="assets/img/notebook.png" alt="" />
+            <h3>Rewrite the whole page</h3>
+          </div>
+          <p>
+            Modify the full page instead of adding a small extra note.
+          </p>
+          <p><span class="pm pm-plus">(+) </span><strong>Lookup:</strong> Just find the page needed.</p>
+          <p><span class="pm pm-minus">(−) </span><strong>Update:</strong> Find the page first, then rewrite it.</p>
+        </div>
+      </div>
+
+      <div style="height:16px"></div>
+
+      <div class="callout" style="margin-bottom: 50px;">
+        Aster adaptively uses both update methods to keep the strengths of each.
+      </div>
+
+
+
+
+      <h2 class="section-title" style="margin-top: 56px;">
+        Aster’s answer: <span class="accent">Poly‑LSM</span>
+      </h2>
+
+      <p class="section-lead">
+        Poly‑LSM keeps both ideas in the same storage engine.
+        For one vertex, it can store one main neighborhood record and several smaller change records.
+        That lets Aster start with cheap writes when needed, then recover cleaner reads as the data is reorganized in the background.
+      </p>
+
 
       <div class="diagram" style="margin-top: 28px;">
         <img
           src="assets/img/poly-lsm.png"
-          alt="Poly-LSM"
+          alt="Poly-LSM overview diagram"
           style="width:100%; height:auto; display:block;"
         />
       </div>
+      
+      <div style="height:16px"></div>
 
-      <div style="height: 56px;"></div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>One main page</h3>
+          <p>
+            Each vertex keeps one main record that stores most of its neighborhood.<br />
+            This is called a <strong>pivot entry</strong>.
+          </p>
+        </div>
 
+        <div class="card">
+          <h3>Small extra notes</h3>
+          <p>
+            New edge changes can also be written as smaller records instead of rewriting the whole neighborhood immediately.<br />
+            These are called <strong>delta entries</strong>.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Background cleanup</h3>
+          <p>
+            As RocksDB reorganizes data in the background, those smaller records can be merged back into the main record.
+            So updates stay light at first, without giving up cleaner lookups later.
+          </p>
+        </div>
+      </div>
+
+      <div style="height:16px"></div>
+      <h3 style="margin: 0 0 10px; font-size: 18px; letter-spacing: -.01em;">Aster's adaptive choice</h3>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Update-heavy or high-degree</h3>
+          <p>
+            Aster leans toward <strong>delta entries</strong> when a vertex changes often or has many neighbors.
+          </p>
+          <p>
+            Rewriting a large neighborhood on every update would create too much read and write work.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Lookup-heavy or low-degree</h3>
+          <p>
+            Aster leans toward <strong>pivot rewrites</strong> when lookups matter more or the neighborhood is small.
+          </p>
+          <p>
+            Paying a bit more during the update keeps later neighbor reads cleaner and faster.
+          </p>
+        </div>
+      </div>
+
+      <div style="height:14px"></div>
+
+      <div class="callout">
+        Then, as RocksDB compacts data in the background, delta entries can be folded back into the pivot entry.<br />
+        So Aster writes lightly when change is frequent, then gradually restores a cleaner layout over time.
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <!-- DEMO / ADAPT --> 
+  <section id="demo" class="section">
+    <div class="container">
       <h2 class="section-title">
         How <span class="accent">Aster</span> adapts to your workload
       </h2>
@@ -308,7 +443,8 @@
     </div>
     <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
       <a href="#graphs">Why</a>
-      <a href="#how">How Aster works</a>
+      <a href="#how">Aster's Idea</a>
+      <a href="#demo">Aster in Action</a>
       <a href="#pub-contact">Publications &amp; Contact</a>
       <a href="docs/index.html">Docs</a>
     </div>
