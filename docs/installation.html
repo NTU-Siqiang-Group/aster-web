@@ -48,7 +48,7 @@
           <a data-doc-close class="active" aria-current="page" href="installation.html">Installation</a>
           <a data-doc-close href="index.html">Quick Start</a>
           <a data-doc-close href="features.html">Key Features</a>
-          <a data-doc-close href="api.html">API &amp; Examples</a>
+          <a data-doc-close href="api.html">Graph Operations</a>
           <a data-doc-close href="benchmarks.html">Benchmarks</a>
         </nav>
       </div>
@@ -60,7 +60,7 @@
     <a class="active" aria-current="page" href="installation.html">Installation</a>
     <a href="index.html">Quick Start</a>
     <a href="features.html">Key Features</a>
-    <a href="api.html">API &amp; Examples</a>
+    <a href="api.html">Graph Operations</a>
     <a href="benchmarks.html">Benchmarks</a>
   </nav>
 </aside>
@@ -68,9 +68,131 @@
     <article class="doc-content">
       <h1>Installation</h1>
       <p>
-        Hello, World!
+        Aster compiles as a static or shared library on top of RocksDB.
+        This page covers compiler requirements, dependencies, build commands,
+        and platform-specific instructions.
       </p>
 
+      <h2>Requirements</h2>
+      <div class="card">
+        <ul>
+          <li><strong>C++17 compiler</strong> — GCC &ge; 7 or Clang &ge; 5</li>
+          <li><strong>Make</strong> — GNU Make build system</li>
+          <li><strong>gflags 2.2.0+</strong> — required for tools and the <code>graph_test</code> driver</li>
+        </ul>
+      </div>
+
+
+      <h2>Build Aster</h2>
+      <div class="callout">
+        <strong>Important:</strong> Do not use <code>make</code> or <code>make all</code> for production.
+        They compile in debug mode, which is significantly slower than release mode.
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>Recommended: static library (release mode)</h3>
+        <pre class="mono">make static_lib</pre>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>Shared library (release mode)</h3>
+        <pre class="mono">make shared_lib</pre>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>Debug builds (testing only)</h3>
+        <ul>
+          <li><code>make check</code> — compile and run all unit tests (debug mode)</li>
+          <li><code>make all</code> — compile static library, tools, and unit tests (debug mode)</li>
+        </ul>
+      </div>
+
+      <div class="callout" style="margin-top:14px;">
+        <strong>Portability flag:</strong>
+        By default, the binary is optimized for your CPU (<code>-march=native</code>).
+        Set <code>PORTABLE=1</code> for maximum compatibility, or
+        <code>PORTABLE=haswell</code> as a reasonable compromise for processors made since ~2013.
+      </div>
+
+      <h2>Build &amp; Verify Graph Tests</h2>
+      <p>
+        After building the library, compile the graph test driver and run the tiny example
+        to verify your installation:
+      </p>
+      <div class="card">
+        <pre class="mono">cd graph_test/ &amp;&amp; make all
+./graph_example --load_mode=tiny</pre>
+      </div>
+      <p>
+        A successful run prints the neighbors of vertex <code>1</code>, then shows one fewer
+        edge after the delete. See the <a href="index.html">Quick Start</a> page for more
+        examples.
+      </p>
+
+      <h2>Recommended Compression Libraries</h2>
+      <p>
+        Aster compiles without any compression library, but installing these is recommended
+        for production use:
+      </p>
+      <div class="grid-3">
+        <div class="card"><h3>zlib</h3><p>General-purpose data compression</p></div>
+        <div class="card"><h3>bzip2</h3><p>Block-sorting compression</p></div>
+        <div class="card"><h3>lz4</h3><p>Extremely fast compression</p></div>
+        <div class="card"><h3>snappy</h3><p>Fast compression by Google</p></div>
+        <div class="card"><h3>zstandard</h3><p>Real-time compression by Facebook</p></div>
+      </div>
+
+      <h2>Platform-Specific Instructions</h2>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Ubuntu / Debian</h3>
+          <pre class="mono">sudo apt-get install libgflags-dev
+sudo apt-get install libsnappy-dev
+sudo apt-get install zlib1g-dev
+sudo apt-get install libbz2-dev
+sudo apt-get install liblz4-dev
+sudo apt-get install libzstd-dev</pre>
+        </div>
+
+        <div class="card">
+          <h3>CentOS / RHEL</h3>
+          <pre class="mono">git clone https://github.com/gflags/gflags.git
+cd gflags &amp;&amp; git checkout v2.2.0
+./configure &amp;&amp; make &amp;&amp; sudo make install
+
+sudo yum install snappy snappy-devel
+sudo yum install zlib zlib-devel
+sudo yum install bzip2 bzip2-devel
+sudo yum install lz4-devel
+sudo yum install libzstd-devel</pre>
+        </div>
+
+        <div class="card">
+          <h3>macOS</h3>
+          <pre class="mono">xcode-select --install
+brew install rocksdb</pre>
+          <p style="margin-top:8px;">
+            Or build from source after installing Xcode command-line tools and
+            a C++17-capable compiler via Homebrew.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Windows</h3>
+          <p>
+            Requires Visual Studio 2017 or later. Follow the instructions in
+            <code>CMakeLists.txt</code>, or install via
+            <a href="https://github.com/microsoft/vcpkg" style="text-decoration:underline;">vcpkg</a>:
+          </p>
+          <pre class="mono">vcpkg install rocksdb:x64-windows</pre>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:14px;">
+        FreeBSD, OpenBSD, iOS, AIX, and Solaris Sparc are also supported.
+        See the <code>INSTALL.md</code> file in the repository for detailed instructions.
+      </div>
 
     </article>
 
@@ -81,7 +203,7 @@
   <div class="container footer-grid">
     <div>
       <div class="footer-title">Aster Docs</div>
-      <div>Installation • Quick Start • Key Features • API • Benchmarks</div>
+      <div>Installation • Quick Start • Key Features • Graph Operations • Benchmarks</div>
     </div>
     <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
       <a href="../index.html">Landing</a>

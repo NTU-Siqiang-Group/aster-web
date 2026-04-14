@@ -47,8 +47,18 @@
         <nav aria-label="Documentation navigation" class="side-nav">
           <a data-doc-close href="installation.html">Installation</a>
           <a data-doc-close href="index.html">Quick Start</a>
-          <a data-doc-close class="active" aria-current="page" href="features.html">Key Features</a>
-          <a data-doc-close href="api.html">API &amp; Examples</a>
+          <div class="side-group">
+            <a data-doc-close class="active" aria-current="page" href="features.html">Key Features</a>
+            <div aria-label="Features section shortcuts" class="side-subnav">
+              <a data-doc-close href="#poly-lsm">Poly-LSM Architecture</a>
+              <a data-doc-close href="#encoding">Adjacency Encoding</a>
+              <a data-doc-close href="#degree">Degree Approximation</a>
+              <a data-doc-close href="#properties">Property Support</a>
+              <a data-doc-close href="#rocksdb">Built on RocksDB</a>
+              <a data-doc-close href="#highlights">Performance Highlights</a>
+            </div>
+          </div>
+          <a data-doc-close href="api.html">Graph Operations</a>
           <a data-doc-close href="benchmarks.html">Benchmarks</a>
         </nav>
       </div>
@@ -59,8 +69,18 @@
   <nav class="side-nav">
     <a href="installation.html">Installation</a>
     <a href="index.html">Quick Start</a>
-    <a class="active" aria-current="page" href="features.html">Key Features</a>
-    <a href="api.html">API &amp; Examples</a>
+    <div class="side-group">
+      <a class="active" aria-current="page" href="features.html">Key Features</a>
+      <div aria-label="Features section shortcuts" class="side-subnav">
+        <a href="#poly-lsm">Poly-LSM Architecture</a>
+        <a href="#encoding">Adjacency Encoding</a>
+        <a href="#degree">Degree Approximation</a>
+        <a href="#properties">Property Support</a>
+        <a href="#rocksdb">Built on RocksDB</a>
+        <a href="#highlights">Performance Highlights</a>
+      </div>
+    </div>
+    <a href="api.html">Graph Operations</a>
     <a href="benchmarks.html">Benchmarks</a>
   </nav>
 </aside>
@@ -68,8 +88,162 @@
     <article class="doc-content">
       <h1>Key Features</h1>
       <p>
-        Hello, World!
+        Aster extends RocksDB with <strong>RocksGraph</strong>, a graph storage and traversal layer
+        designed for workloads that combine frequent edge and vertex mutations with
+        neighbor-lookup-heavy queries. The design is based on the
+        <em>Poly-LSM</em> architecture described in the SIGMOD 2025 paper.
       </p>
+
+      <h2 id="poly-lsm">Poly-LSM Architecture</h2>
+      <p>
+        The core innovation in Aster is an adaptive edge update strategy that
+        chooses the best write path for each vertex based on current workload
+        characteristics.
+      </p>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Eager</h3>
+          <p>
+            Reads the existing adjacency list, merges the new edge in-place, and writes
+            back via <code>Put</code>. Best for low-degree vertices with frequent lookups.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Lazy</h3>
+          <p>
+            Uses merge operators (<code>AdjacentListMergeOp</code>) for incremental writes,
+            avoiding full adjacency reads. Best for high-degree vertices under heavy mutation.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Adaptive</h3>
+          <p>
+            Dynamically switches between eager and lazy at runtime, using degree estimates
+            and update/lookup ratios to pick the optimal strategy per vertex.
+          </p>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:14px;">
+        In adaptive mode, Aster evaluates a cost model for each edge operation.
+        The decision boundary depends on the vertex degree, block size, and
+        the current read-to-write ratio — the same formula shown in the
+        <a href="../index.html#demo">interactive demo</a> on the landing page.
+      </div>
+
+      <h2 id="encoding">Adjacency Encoding</h2>
+      <p>
+        Aster supports two adjacency list storage formats, controlled by the
+        <code>encoding_type</code> parameter at graph creation time.
+      </p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Raw (<code>ENCODING_TYPE_NONE</code>)</h3>
+          <p>
+            Adjacency lists stored without compression. Provides the fastest
+            read and write access at the cost of larger storage footprint.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Elias&ndash;Fano (<code>ENCODING_TYPE_EFP</code>)</h3>
+          <p>
+            Partitioned Elias&ndash;Fano compression. Significantly reduces
+            storage size while still enabling efficient random access to
+            individual neighbors.
+          </p>
+        </div>
+      </div>
+
+      <h2 id="degree">Degree Approximation</h2>
+      <p>
+        When an exact degree count is not required, Aster provides O(1) estimation
+        via <code>GetDegreeApproximate()</code>, avoiding the cost of reading and
+        decoding the full adjacency list.
+      </p>
+      <div class="card">
+        <h3>Morris Counter</h3>
+        <p>
+          Space-efficient logarithmic counter using <code>FILTER_TYPE_MORRIS</code>.
+          Default estimator. Extremely compact representation.
+        </p>
+      </div>
+      <div class="callout" style="margin-top:14px;">
+        The adaptive update policy uses these degree estimates internally to
+        decide between eager and lazy writes — no extra configuration needed.
+      </div>
+
+      <h2 id="properties">Property Support</h2>
+      <p>
+        Both vertices and edges can carry arbitrary key-value properties.
+        Properties are stored in dedicated column families
+        (<code>vprop_val</code> and <code>eprop_val</code>), separate from
+        the adjacency data.
+      </p>
+      <div class="card">
+        <h3>Capabilities</h3>
+        <ul>
+          <li>Write and read properties per vertex or per edge</li>
+          <li>Scan-based reverse lookup: find all vertices or edges matching a given property</li>
+          <li>Multiple properties per entity, stored as concatenated name-value pairs</li>
+        </ul>
+      </div>
+      <div class="callout" style="margin-top:14px;">
+        The property lookup helpers (<code>GetVerticesWithProperty</code>,
+        <code>GetEdgesWithProperty</code>) are convenience scan functions.
+        They are useful for testing and small workloads, but they are not
+        secondary-index lookups.
+      </div>
+
+      <h2 id="rocksdb">Built on RocksDB</h2>
+      <p>
+        Aster inherits the full production-grade infrastructure of RocksDB,
+        the LSM-tree storage engine used in production at Facebook, ByteDance,
+        LinkedIn, and many more.
+      </p>
+      <div class="card">
+        <h3>What you get for free</h3>
+        <ul>
+          <li>Bloom filters for fast negative lookups</li>
+          <li>Direct I/O support for bypassing OS page cache</li>
+          <li>Pluggable compression codecs (zlib, lz4, snappy, zstd)</li>
+          <li>Column families for logical data separation</li>
+          <li>Write-ahead log and crash recovery</li>
+          <li>Extensive statistics and diagnostics via <code>GetRocksDBStats()</code></li>
+        </ul>
+      </div>
+
+      <h2 id="highlights">Performance Highlights</h2>
+      <p>
+        The Poly-LSM design delivers substantial improvements over both standard
+        LSM approaches and competing graph databases.
+      </p>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Highly scalable</h3>
+          <p>
+            Achieves significant comparative performance at billion-scale graphs
+            where other approaches degrade.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Mixed workload robustness</h3>
+          <p>
+            Adaptive policy avoids worst-case degradation regardless of the
+            read/write ratio.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Disk-native design</h3>
+          <p>
+            Scales to graphs that exceed available memory, backed by
+            RocksDB&rsquo;s proven LSM-tree storage.
+          </p>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:14px;">
+        See the <a href="benchmarks.html">Benchmarks</a> page for detailed
+        GDSE benchmark results comparing Aster against five other graph databases
+        across six real-world datasets.
+      </div>
 
     </article>
 
@@ -80,7 +254,7 @@
   <div class="container footer-grid">
     <div>
       <div class="footer-title">Aster Docs</div>
-      <div>Installation • Quick Start • Key Features • API • Benchmarks</div>
+      <div>Installation • Quick Start • Key Features • Graph Operations • Benchmarks</div>
     </div>
     <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
       <a href="../index.html">Landing</a>

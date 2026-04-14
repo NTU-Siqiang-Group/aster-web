@@ -6,6 +6,7 @@
   <meta name="description" content="Aster documentation: benchmark results and how to reproduce"/>
   <title>Aster Docs — Benchmarks</title>
   <link rel="stylesheet" href="../assets/css/main.css"/>
+  <script src="https://cdn.plot.ly/plotly-3.3.1.min.js" charset="utf-8"></script>
 </head>
 <body>
 
@@ -37,7 +38,7 @@
 <main class="docs">
   <div class="container docs-grid">
 
-    
+
     <details class="docs-mobile-nav">
       <summary aria-label="Open documentation navigation">
         <span class="docs-mobile-current">Benchmarks</span>
@@ -48,8 +49,16 @@
           <a data-doc-close href="installation.html">Installation</a>
           <a data-doc-close href="index.html">Quick Start</a>
           <a data-doc-close href="features.html">Key Features</a>
-          <a data-doc-close href="api.html">API &amp; Examples</a>
-          <a data-doc-close class="active" aria-current="page" href="benchmarks.html">Benchmarks</a>
+          <a data-doc-close href="api.html">Graph Operations</a>
+          <div class="side-group">
+            <a data-doc-close class="active" aria-current="page" href="benchmarks.html">Benchmarks</a>
+            <div aria-label="Benchmarks section shortcuts" class="side-subnav">
+              <a data-doc-close href="#setup">Test Setup</a>
+              <a data-doc-close href="#perf">Performance Comparison</a>
+              <a data-doc-close href="#batch">Batch Size Analysis</a>
+              <a data-doc-close href="#reproduce">Reproduce</a>
+            </div>
+          </div>
         </nav>
       </div>
     </details>
@@ -60,8 +69,16 @@
     <a href="installation.html">Installation</a>
     <a href="index.html">Quick Start</a>
     <a href="features.html">Key Features</a>
-    <a href="api.html">API &amp; Examples</a>
-    <a class="active" aria-current="page" href="benchmarks.html">Benchmarks</a>
+    <a href="api.html">Graph Operations</a>
+    <div class="side-group">
+      <a class="active" aria-current="page" href="benchmarks.html">Benchmarks</a>
+      <div aria-label="Benchmarks section shortcuts" class="side-subnav">
+        <a href="#setup">Test Setup</a>
+        <a href="#perf">Performance Comparison</a>
+        <a href="#batch">Batch Size Analysis</a>
+        <a href="#reproduce">Reproduce</a>
+      </div>
+    </div>
   </nav>
 </aside>
 
@@ -69,12 +86,105 @@
     <article class="doc-content">
       <h1>Benchmark Results</h1>
       <p>
-        Hello, World!
+        GDSE (Graph Database Storage Engine) benchmark comparing Aster against five
+        graph databases using native API latency tests across six real-world datasets.
       </p>
 
+      <h2 id="setup">Test Setup</h2>
+
+      <div class="grid-3">
+        <div class="card" style="padding:14px;">
+          <h3 style="font-size:13px; color:var(--muted); margin:0 0 6px;">Databases</h3>
+          <div style="display:flex; flex-wrap:wrap; gap:4px;">
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-rgb),.22); background:rgba(var(--accent-rgb),.08);">ArangoDB</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-rgb),.22); background:rgba(var(--accent-rgb),.08);">Aster</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-rgb),.22); background:rgba(var(--accent-rgb),.08);">JanusGraph</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-rgb),.22); background:rgba(var(--accent-rgb),.08);">Neo4j</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-rgb),.22); background:rgba(var(--accent-rgb),.08);">OrientDB</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-rgb),.22); background:rgba(var(--accent-rgb),.08);">SQLG</span>
+          </div>
+        </div>
+        <div class="card" style="padding:14px;">
+          <h3 style="font-size:13px; color:var(--muted); margin:0 0 6px;">Workload</h3>
+          <div style="display:flex; flex-wrap:wrap; gap:4px;">
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-2-rgb),.22); background:rgba(var(--accent-2-rgb),.08);">ADD_VERTEX</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-2-rgb),.22); background:rgba(var(--accent-2-rgb),.08);">ADD_EDGE</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-2-rgb),.22); background:rgba(var(--accent-2-rgb),.08);">GET_NBRS</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-2-rgb),.22); background:rgba(var(--accent-2-rgb),.08);">REMOVE_EDGE</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-2-rgb),.22); background:rgba(var(--accent-2-rgb),.08);">REMOVE_VERTEX</span>
+          </div>
+        </div>
+        <div class="card" style="padding:14px;">
+          <h3 style="font-size:13px; color:var(--muted); margin:0 0 6px;">Datasets</h3>
+          <div style="display:flex; flex-wrap:wrap; gap:4px;">
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-3-rgb),.22); background:rgba(var(--accent-3-rgb),.08);">cit-Patents</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-3-rgb),.22); background:rgba(var(--accent-3-rgb),.08);">coAuthorsDBLP</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-3-rgb),.22); background:rgba(var(--accent-3-rgb),.08);">delaunay_n13</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-3-rgb),.22); background:rgba(var(--accent-3-rgb),.08);">delaunay_n21</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-3-rgb),.22); background:rgba(var(--accent-3-rgb),.08);">movielens-small</span>
+            <span style="font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid rgba(var(--accent-3-rgb),.22); background:rgba(var(--accent-3-rgb),.08);">osm-singapore</span>
+          </div>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:14px;">
+        Native API latency test. Best batch size selected per database for each dataset.
+      </div>
+
+      <h2 id="perf">Performance Comparison</h2>
+      <p>
+        Aster consistently achieves 9&ndash;12 &micro;s average latency across all workloads,
+        outperforming the next-best database by 10&ndash;90&times;.
+      </p>
+
+      <!-- Performance tab bar -->
+      <div class="bench-tabs" id="perf-tabs" role="tablist">
+        <button class="bench-tab active" role="tab" data-key="perf_cit-Patents" onclick="switchChart('perf-tabs','perf-chart',this.dataset.key)">cit-Patents</button>
+        <button class="bench-tab" role="tab" data-key="perf_coAuthorsDBLP" onclick="switchChart('perf-tabs','perf-chart',this.dataset.key)">coAuthorsDBLP</button>
+        <button class="bench-tab" role="tab" data-key="perf_delaunay_n13" onclick="switchChart('perf-tabs','perf-chart',this.dataset.key)">delaunay_n13</button>
+        <button class="bench-tab" role="tab" data-key="perf_delaunay_n21" onclick="switchChart('perf-tabs','perf-chart',this.dataset.key)">delaunay_n21</button>
+        <button class="bench-tab" role="tab" data-key="perf_movielens-small" onclick="switchChart('perf-tabs','perf-chart',this.dataset.key)">movielens-small</button>
+        <button class="bench-tab" role="tab" data-key="perf_osm-singapore" onclick="switchChart('perf-tabs','perf-chart',this.dataset.key)">osm-singapore</button>
+      </div>
+      <div class="card bench-chart-card">
+        <div id="perf-chart" style="width:100%;height:460px;"></div>
+      </div>
+
+      <h2 id="batch">Batch Size Analysis</h2>
+      <p>
+        How latency scales with batch size for ADD_VERTEX and ADD_EDGE operations
+        on the coAuthorsDBLP dataset. All databases benefit from batching, but the
+        magnitude varies dramatically.
+      </p>
+
+      <!-- Batch tab bar -->
+      <div class="bench-tabs" id="batch-tabs" role="tablist">
+        <button class="bench-tab active" role="tab" data-key="batch_ADD_VERTEX" onclick="switchChart('batch-tabs','batch-chart',this.dataset.key)">ADD_VERTEX</button>
+        <button class="bench-tab" role="tab" data-key="batch_ADD_EDGE" onclick="switchChart('batch-tabs','batch-chart',this.dataset.key)">ADD_EDGE</button>
+      </div>
+      <div class="card bench-chart-card">
+        <div id="batch-chart" style="width:100%;height:460px;"></div>
+      </div>
+
+      <h2 id="reproduce">Reproduce</h2>
+      <p>
+        All results on this page are produced by the GDSE (Graph Database Storage Engine)
+        benchmark suite. The full harness, scripts, and instructions for reproducing
+        these experiments are available at:
+      </p>
+      <div class="card">
+        <h3>GDSE Benchmarks</h3>
+        <p>
+          <a href="https://github.com/WittenYeh/GDSE-Benchmarks" style="text-decoration:underline;">
+            github.com/WittenYeh/GDSE-Benchmarks
+          </a>
+        </p>
+        <p>
+          The repository includes dataset loaders, workload generators, per-database
+          adapters, and batch-size sweep scripts for all six databases tested above.
+        </p>
+      </div>
 
     </article>
-
 
   </div>
 </main>
@@ -83,7 +193,7 @@
   <div class="container footer-grid">
     <div>
       <div class="footer-title">Aster Docs</div>
-      <div>Installation • Quick Start • Key Features • API • Benchmarks</div>
+      <div>Installation • Quick Start • Key Features • Graph Operations • Benchmarks</div>
     </div>
     <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
       <a href="../index.html">Landing</a>
@@ -133,5 +243,209 @@
     });
   })();
 </script>
+
+<script>
+/* ── Benchmark chart data and rendering ── */
+
+const DB_COLORS = {
+  'aster':      '#d98336',
+  'neo4j':      '#7fa4cd',
+  'janusgraph': '#9bb39a',
+  'arangodb':   '#d8ba77',
+  'orientdb':   '#b0a090',
+  'sqlg':       '#a0a0a0'
+};
+
+const ASTER_LAYOUT = {
+  paper_bgcolor: '#ffffff',
+  plot_bgcolor:  '#fbfaf7',
+  font: {
+    family: 'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
+    color:  '#181512',
+    size:   13
+  },
+  legend: {
+    bgcolor:     'rgba(255,255,255,0.9)',
+    bordercolor: 'rgba(24,21,18,0.12)',
+    borderwidth: 1,
+    font: { size: 12 },
+    title: { text: '<b>Database</b>' },
+    orientation: 'v',
+    yanchor: 'top', y: 1,
+    xanchor: 'left', x: 1.02
+  },
+  margin: { l: 70, r: 140, t: 56, b: 80 },
+  hovermode: 'closest'
+};
+
+const PLOTLY_CONFIG = { responsive: true, displayModeBar: false };
+
+/* ── Performance comparison data (6 datasets × 6 databases, bar charts) ── */
+
+const benchmarkData = {
+  'perf_cit-Patents': {
+    traces: [
+      {name:'neo4j',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[49.306,10.606,30.859,76.983,223.049],type:'bar'},
+      {name:'janusgraph',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[0.035,38.092,69.564,122.003,309.533],type:'bar'},
+      {name:'orientdb',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[429.628,13.272,399.176,1152.526,3178.214],type:'bar'},
+      {name:'sqlg',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[130.12,16.922,114.21,469.293,435.011],type:'bar'},
+      {name:'arangodb',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[46.521,30.182,71.966,105.705,5.408],type:'bar'},
+      {name:'aster',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[17.995,8.145,13.09,17.506,0.014],type:'bar'}
+    ],
+    layout: {
+      title: { text: '<b>cit-Patents</b><br><sub>medium · structural workload</sub>', x: 0.5, xanchor: 'center' },
+      xaxis: { title: { text: '<b>Task Type</b>' }, tickangle: -30, showgrid: false },
+      yaxis: { title: { text: '<b>Best Latency (μs)</b>' }, type: 'log', showgrid: true, gridcolor: 'rgba(24,21,18,0.06)', zeroline: false },
+      barmode: 'group'
+    }
+  },
+  'perf_coAuthorsDBLP': {
+    traces: [
+      {name:'neo4j',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[27.764,11.934,6.784,46.2,183.829],type:'bar'},
+      {name:'janusgraph',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[0.032,25.602,86.211,92.14,234.943],type:'bar'},
+      {name:'orientdb',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[265.971,13.732,56.63,414.928,1206.647],type:'bar'},
+      {name:'sqlg',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[115.697,16.31,87.284,407.071,349.379],type:'bar'},
+      {name:'arangodb',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[51.108,28.184,79.944,91.166,7.699],type:'bar'},
+      {name:'aster',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[17.749,7.938,5.908,17.532,0.013],type:'bar'}
+    ],
+    layout: {
+      title: { text: '<b>coAuthorsDBLP</b><br><sub>medium · structural workload</sub>', x: 0.5, xanchor: 'center' },
+      xaxis: { title: { text: '<b>Task Type</b>' }, tickangle: -30, showgrid: false },
+      yaxis: { title: { text: '<b>Best Latency (μs)</b>' }, type: 'log', showgrid: true, gridcolor: 'rgba(24,21,18,0.06)', zeroline: false },
+      barmode: 'group'
+    }
+  },
+  'perf_delaunay_n13': {
+    traces: [
+      {name:'neo4j',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[17.041,6.767,1.862,27.853,73.288],type:'bar'},
+      {name:'janusgraph',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[0.151,42.164,57.689,102.331,121.172],type:'bar'},
+      {name:'orientdb',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[49.586,15.453,23.258,70.618,147.776],type:'bar'},
+      {name:'sqlg',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[131.181,17.335,56.578,199.931,154.541],type:'bar'},
+      {name:'arangodb',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[59.617,35.907,44.454,49.932,12.365],type:'bar'},
+      {name:'aster',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[17.213,10.887,3.105,17.077,0.014],type:'bar'}
+    ],
+    layout: {
+      title: { text: '<b>delaunay_n13</b><br><sub>small · structural workload</sub>', x: 0.5, xanchor: 'center' },
+      xaxis: { title: { text: '<b>Task Type</b>' }, tickangle: -30, showgrid: false },
+      yaxis: { title: { text: '<b>Best Latency (μs)</b>' }, type: 'log', showgrid: true, gridcolor: 'rgba(24,21,18,0.06)', zeroline: false },
+      barmode: 'group'
+    }
+  },
+  'perf_delaunay_n21': {
+    traces: [
+      {name:'neo4j',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[67.29,13.075,17.804,53.776,281.758],type:'bar'},
+      {name:'janusgraph',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[0.034,28.409,70.181,111.075,289.632],type:'bar'},
+      {name:'orientdb',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[398.996,12.153,329.902,703.13,1859.877],type:'bar'},
+      {name:'sqlg',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[144.974,23.86,109.015,341.589,408.06],type:'bar'},
+      {name:'arangodb',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[52.823,32.99,86.407,53.497,8.154],type:'bar'},
+      {name:'aster',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[17.73,8.034,9.517,24.33,0.014],type:'bar'}
+    ],
+    layout: {
+      title: { text: '<b>delaunay_n21</b><br><sub>medium · structural workload</sub>', x: 0.5, xanchor: 'center' },
+      xaxis: { title: { text: '<b>Task Type</b>' }, tickangle: -30, showgrid: false },
+      yaxis: { title: { text: '<b>Best Latency (μs)</b>' }, type: 'log', showgrid: true, gridcolor: 'rgba(24,21,18,0.06)', zeroline: false },
+      barmode: 'group'
+    }
+  },
+  'perf_movielens-small': {
+    traces: [
+      {name:'neo4j',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[27.605,6.333,2.307,58.33,109.463],type:'bar'},
+      {name:'janusgraph',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[0.146,27.677,75.213,105.105,171.592],type:'bar'},
+      {name:'orientdb',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[77.343,19.873,39.442,731.395,496.564],type:'bar'},
+      {name:'sqlg',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[139.657,22.653,59.846,4090.582,159.964],type:'bar'},
+      {name:'arangodb',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[59.64,36.685,57.777,135.096,10.865],type:'bar'},
+      {name:'aster',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[19.188,8.526,4.745,17.414,0.065],type:'bar'}
+    ],
+    layout: {
+      title: { text: '<b>movielens-small</b><br><sub>small · structural workload</sub>', x: 0.5, xanchor: 'center' },
+      xaxis: { title: { text: '<b>Task Type</b>' }, tickangle: -30, showgrid: false },
+      yaxis: { title: { text: '<b>Best Latency (μs)</b>' }, type: 'log', showgrid: true, gridcolor: 'rgba(24,21,18,0.06)', zeroline: false },
+      barmode: 'group'
+    }
+  },
+  'perf_osm-singapore': {
+    traces: [
+      {name:'neo4j',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[21.212,4.727,0.96,24.818,48.609],type:'bar'},
+      {name:'janusgraph',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[0.15,34.798,56.024,108.856,159.219],type:'bar'},
+      {name:'orientdb',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[62.952,14.182,16.067,64.71,114.893],type:'bar'},
+      {name:'sqlg',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[135.688,16.697,49.914,189.25,90.815],type:'bar'},
+      {name:'arangodb',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[59.303,36.393,38.191,35.946,12.712],type:'bar'},
+      {name:'aster',x:['ADD_EDGE','ADD_VERTEX','GET_NBRS','REMOVE_EDGE','REMOVE_VERTEX'],y:[17.498,8.393,2.907,17.436,0.013],type:'bar'}
+    ],
+    layout: {
+      title: { text: '<b>osm-singapore</b><br><sub>small · structural workload</sub>', x: 0.5, xanchor: 'center' },
+      xaxis: { title: { text: '<b>Task Type</b>' }, tickangle: -30, showgrid: false },
+      yaxis: { title: { text: '<b>Best Latency (μs)</b>' }, type: 'log', showgrid: true, gridcolor: 'rgba(24,21,18,0.06)', zeroline: false },
+      barmode: 'group'
+    }
+  },
+
+  /* ── Batch size analysis (2 operations × 5 databases, line charts) ── */
+
+  'batch_ADD_VERTEX': {
+    traces: [
+      {name:'neo4j',x:[1,2,4,8,16,32,64,128,256,512,1024,2048,4096],y:[350.806,164.486,90.86,57.215,35.689,25.233,18.867,14.781,13.669,13.101,12.918,12.719,12.638],type:'scatter',mode:'lines+markers'},
+      {name:'janusgraph',x:[1,2,4,8,16,32,64,128,256,512,1024,2048,4096],y:[726.487,369.428,277.218,164.148,125.772,126.31,105.137,42.053,39.307,26.293,29.021,24.828,25.374],type:'scatter',mode:'lines+markers'},
+      {name:'orientdb',x:[1,2,4,8,16,32,64,128,256,512,1024,2048,4096],y:[23.36,19.651,23.833,23.467,22.361,21.493,17.798,19.645,15.674,14.954,13.582,14.278,14.011],type:'scatter',mode:'lines+markers'},
+      {name:'sqlg',x:[1,2,4,8,16,32,64,128,256,512,1024,2048,4096],y:[37.494,19.644,24.113,23.769,25.445,22.878,22.883,24.467,22.597,22.485,22.725,22.693,23.362],type:'scatter',mode:'lines+markers'},
+      {name:'arangodb',x:[1,2,4,8,16,32,64,128,256,512,1024,2048,4096],y:[2177.245,1107.454,608.696,304.601,203.039,134.619,91.605,63.124,65.29,60.108,49.851,36.644,30.266],type:'scatter',mode:'lines+markers'}
+    ],
+    layout: {
+      title: { text: '<b>ADD_VERTEX</b><br><sub>coAuthorsDBLP · batch size comparison</sub>', x: 0.5, xanchor: 'center' },
+      xaxis: { title: { text: '<b>Batch Size</b>' }, type: 'log', showgrid: true, gridcolor: 'rgba(24,21,18,0.06)' },
+      yaxis: { title: { text: '<b>Latency (μs)</b>' }, type: 'log', showgrid: true, gridcolor: 'rgba(24,21,18,0.06)', zeroline: false }
+    }
+  },
+  'batch_ADD_EDGE': {
+    traces: [
+      {name:'neo4j',x:[1,2,4,8,16,32,64,128,256,512,1024,2048,4096],y:[431.956,231.843,138.413,84.162,51.173,40.291,38.926,30.642,30.306,29.611,30.833,33.355,34.516],type:'scatter',mode:'lines+markers'},
+      {name:'janusgraph',x:[1,2,4,8,16,32,64,128,256,512,1024,2048,4096],y:[19.357,8.543,4.407,2.176,1.144,0.572,0.291,0.152,0.08,0.055,0.025,0.018,0.012],type:'scatter',mode:'lines+markers'},
+      {name:'orientdb',x:[1,2,4,8,16,32,64,128,256,512,1024,2048,4096],y:[283.293,244.735,261.353,252.376,252.334,249.542,248.787,232.325,280.022,269.205,284.316,222.328,227.407],type:'scatter',mode:'lines+markers'},
+      {name:'sqlg',x:[1,2,4,8,16,32,64,128,256,512,1024,2048,4096],y:[185.821,138.036,123.608,118.481,116.995,116.603,113.775,114.374,136.953,115.275,116.268,117.572,136.21],type:'scatter',mode:'lines+markers'},
+      {name:'arangodb',x:[1,2,4,8,16,32,64,128,256,512,1024,2048,4096],y:[2062.033,1239.574,678.35,387.471,270.636,197.892,155.714,129.676,121.251,102.126,77.679,61.517,56.452],type:'scatter',mode:'lines+markers'}
+    ],
+    layout: {
+      title: { text: '<b>ADD_EDGE</b><br><sub>coAuthorsDBLP · batch size comparison</sub>', x: 0.5, xanchor: 'center' },
+      xaxis: { title: { text: '<b>Batch Size</b>' }, type: 'log', showgrid: true, gridcolor: 'rgba(24,21,18,0.06)' },
+      yaxis: { title: { text: '<b>Latency (μs)</b>' }, type: 'log', showgrid: true, gridcolor: 'rgba(24,21,18,0.06)', zeroline: false }
+    }
+  }
+};
+
+/* ── Apply AsterWeb colors to traces ── */
+
+function styleTraces(traces) {
+  return traces.map(t => {
+    const color = DB_COLORS[t.name] || '#888';
+    const styled = { ...t, marker: { color, line: { color: '#fff', width: 1 } } };
+    if (t.type === 'scatter') {
+      styled.line = { color, width: 2.5 };
+      styled.marker = { color, size: 6, line: { color: '#fff', width: 1 } };
+    }
+    return styled;
+  });
+}
+
+/* ── Tab switching ── */
+
+function switchChart(tabBarId, chartDivId, key) {
+  document.querySelectorAll('#' + tabBarId + ' .bench-tab').forEach(function(t) {
+    t.classList.toggle('active', t.dataset.key === key);
+  });
+  Plotly.purge(chartDivId);
+  var entry = benchmarkData[key];
+  if (!entry) return;
+  var merged = Object.assign({}, ASTER_LAYOUT, entry.layout);
+  Plotly.newPlot(chartDivId, styleTraces(entry.traces), merged, PLOTLY_CONFIG);
+}
+
+/* ── Init: render first tab in each group ── */
+
+document.addEventListener('DOMContentLoaded', function() {
+  switchChart('perf-tabs',  'perf-chart',  'perf_cit-Patents');
+  switchChart('batch-tabs', 'batch-chart', 'batch_ADD_VERTEX');
+});
+</script>
+
 </body>
 </html>

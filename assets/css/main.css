@@ -153,12 +153,12 @@ a:hover{ opacity:.95; }
 
 /* Hero */
 .hero{
-  padding: 56px 0 28px;
+  padding: 48px 0 28px;
 }
 .hero-grid{
   display:grid;
-  grid-template-columns: .95fr 1.05fr;
-  gap: 34px;
+  grid-template-columns: .8fr 1.2fr;
+  gap: 48px;
   align-items: center;
 }
 
@@ -176,16 +176,16 @@ a:hover{ opacity:.95; }
 
 .h1{
   margin: 16px 0 8px;
-  font-size: clamp(40px, 4.6vw, 64px);
+  font-size: clamp(32px, 3.6vw, 50px);
   letter-spacing: -.02em;
 }
 
 .h1 .accent{ color: var(--accent); }
 
 .subhead{
-  margin: 0 0 20px;
+  margin: 0 0 24px;
   color: var(--muted);
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1.6;
   max-width: 58ch;
 }
@@ -780,3 +780,41 @@ a:hover{ opacity:.95; }
 }
 .pm-plus{ color:#3b82f6; }
 .pm-minus{ color:#dc2626; }
+
+/* Benchmark tab bar */
+.bench-tabs{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.bench-tab{
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  background: var(--bg-2);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+
+.bench-tab:hover{
+  background: rgba(var(--tint),.04);
+  color: var(--fg);
+}
+
+.bench-tab.active{
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), .14), rgba(var(--accent-2-rgb), .12));
+  border-color: rgba(var(--accent-rgb), .26);
+  color: var(--fg);
+  font-weight: 700;
+}
+
+.bench-chart-card{
+  border-top-left-radius: 0;
+  margin-top: 0;
+}

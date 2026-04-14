@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="description" content="Aster documentation: API definitions and examples"/>
-  <title>Aster Docs — API & Examples</title>
+  <meta name="description" content="Aster documentation: graph operations reference"/>
+  <title>Aster Docs — Graph Operations</title>
   <link rel="stylesheet" href="../assets/css/main.css"/>
 </head>
 <body>
@@ -36,30 +36,34 @@
 <main class="docs">
   <div class="container docs-grid">
 
-    
-        <details class="docs-mobile-nav">
-          <summary aria-label="Open documentation navigation">
-            <span class="docs-mobile-current">API & Examples</span>
-            <span aria-hidden="true" class="docs-mobile-nav-toggle"></span>
-          </summary>
-          <div class="docs-mobile-panel">
-            <nav aria-label="Documentation navigation" class="side-nav">
-              <a data-doc-close href="installation.html">Installation</a>
-              <a data-doc-close href="index.html">Quick Start</a>
-              <a data-doc-close href="features.html">Key Features</a>
-              <div class="side-group">
-      <a class="active" aria-current="page" data-doc-close href="api.html">API &amp; Examples</a>
-      <div aria-label="API section shortcuts" class="side-subnav">
-        <a data-doc-close href="#data-model">Data Model &amp; Storage Layout</a>
-        <a data-doc-close href="#core-apis">Core graph APIs</a>
-        <a data-doc-close href="#property-apis">Properties APIs</a>
-        <a data-doc-close href="#other-apis">Other APIs</a>
-      </div>
-    </div>
-              <a data-doc-close href="benchmarks.html">Benchmarks</a>
-            </nav>
+    <details class="docs-mobile-nav">
+      <summary aria-label="Open documentation navigation">
+        <span class="docs-mobile-current">Graph Operations</span>
+        <span aria-hidden="true" class="docs-mobile-nav-toggle"></span>
+      </summary>
+      <div class="docs-mobile-panel">
+        <nav aria-label="Documentation navigation" class="side-nav">
+          <a data-doc-close href="installation.html">Installation</a>
+          <a data-doc-close href="index.html">Quick Start</a>
+          <a data-doc-close href="features.html">Key Features</a>
+          <div class="side-group">
+            <a class="active" aria-current="page" data-doc-close href="api.html">Graph Operations</a>
+            <div aria-label="Graph Operations section shortcuts" class="side-subnav">
+              <a data-doc-close href="#setup">Setup</a>
+              <a data-doc-close href="#vertex">Vertex Operations</a>
+              <a data-doc-close href="#edge">Edge Operations</a>
+              <a data-doc-close href="#edge-batch">Batch Operations</a>
+              <a data-doc-close href="#properties">Properties</a>
+              <a data-doc-close href="#degree">Degree Queries</a>
+              <a data-doc-close href="#traversal">Traversal</a>
+              <a data-doc-close href="#diagnostics">Diagnostics</a>
+              <a data-doc-close href="#types">Types &amp; Constants</a>
+            </div>
           </div>
-        </details>
+          <a data-doc-close href="benchmarks.html">Benchmarks</a>
+        </nav>
+      </div>
+    </details>
 
     <aside class="sidebar" aria-label="Documentation navigation">
       <div class="sidebar-title">Documentation</div>
@@ -68,91 +72,56 @@
         <a href="index.html">Quick Start</a>
         <a href="features.html">Key Features</a>
         <div class="side-group">
-  <a class="active" aria-current="page" href="api.html">API &amp; Examples</a>
-  <div aria-label="API section shortcuts" class="side-subnav">
-    <a href="#data-model">Data Model &amp; Storage Layout</a>
-    <a href="#core-apis">Core graph APIs</a>
-    <a href="#property-apis">Properties APIs</a>
-    <a href="#other-apis">Other APIs</a>
-  </div>
-</div>
+          <a class="active" aria-current="page" href="api.html">Graph Operations</a>
+          <div aria-label="Graph Operations section shortcuts" class="side-subnav">
+            <a href="#setup">Setup</a>
+            <a href="#vertex">Vertex Operations</a>
+            <a href="#edge">Edge Operations</a>
+            <a href="#edge-batch">Batch Operations</a>
+            <a href="#properties">Properties</a>
+            <a href="#degree">Degree Queries</a>
+            <a href="#traversal">Traversal</a>
+            <a href="#diagnostics">Diagnostics</a>
+            <a href="#types">Types &amp; Constants</a>
+          </div>
+        </div>
         <a href="benchmarks.html">Benchmarks</a>
       </nav>
     </aside>
 
     <article class="doc-content">
-      <h1>API &amp; Examples</h1>
+      <h1>Graph Operations</h1>
       <p>
-        Aster’s public graph interface is exposed in <code>include/rocksdb/graph.h</code>.
-        The main abstraction is <code>RocksGraph</code>, which wraps RocksDB with graph-aware storage,
-        edge update policies, adjacency encoding, degree queries, and property support.
+        All graph operations go through the <code>RocksGraph</code> class defined in
+        <code>include/rocksdb/graph.h</code>. This page is organized by operation type.
       </p>
 
-      <div class="callout" style="margin-top:14px;">
-        Each vertex is stored as one record that contains both its outgoing and incoming neighbors.
-        Vertex properties and edge properties are stored separately.
-      </div>
+      <!-- ───── Setup ───── -->
 
-      <h2>Where the API lives</h2>
-      <div class="card">
-        <h3>Main entry points</h3>
-        <ul>
-          <li><code>include/rocksdb/graph.h</code> — public APIs (data structures, encoding helpers, metadata I/O)</li>
-          <li><code>db/graph.cc</code> — core implementation of storage logic and graph operations</li>
-          <li><code>graph_test/graph_example.cc</code> — smallest end-to-end example</li>
-        </ul>
-      </div>
-
-
-      <h2 id="data-model">Data Model & Storage Layout</h2>
-      <div class="card">
-        <h3>Identifiers</h3>
-        <ul>
-          <li><code>node_id_t</code> — 64-bit integer vertex identifier</li>
-          <li><code>edge_id_t</code> — 64-bit edge identifier type used internally</li>
-        </ul>
-
-        <h3 style="margin-top: 30px;">Storage context</h3>
-        <ul>
-          <li>Each vertex record stores both outgoing and incoming neighbors</li>
-          <li>Vertex properties live in <code>vprop_val</code></li>
-          <li>Edge properties live in <code>eprop_val</code></li>
-          <li>Graph metadata stores vertex and edge counts <code>(n, m)</code></li>
-        </ul>
-        
-        <h3 style="margin-top: 30px;">Returned structures</h3>
-        <ul>
-          <li>
-            <code>Edges</code> is the in-memory structure used to represent one vertex’s outgoing and incoming neighbors.
-            Stored adjacency is decoded into this structure when read.
-          </li>
-          <li>
-            <code>Property</code> stores a <code>name</code> and a <code>value</code>.
-            Vertex properties are stored in <code>vprop_val</code>, and edge properties are stored in <code>eprop_val</code>.
-          </li>
-        </ul>
-      </div>
-
-      <div class="callout" style="margin-top:14px;">
-        <code>GetAllEdges(...)</code> returns adjacency through an <code>Edges</code> structure in memory.
-        After you finish using it, call <code>free_edges(...)</code> to release the returned arrays.
-      </div>
-
-      <div class="callout" style="margin-top:14px;">
-        In the public API, edges are usually identified by their <code>(from, to)</code> endpoints.
-        The graph API works with directed edges. If you want undirected behavior, add both directions.
-      </div>
-
-      <h2>Example1 - Open a graph</h2>
-      <p>
-        A typical setup creates a <code>RocksGraph</code> instance with RocksDB options,
-        an edge update policy, an encoding type, and a database path. 
-        <code>options.create_if_missing = true</code> tells RocksDB to create the database
-        if it does not already exist at <code>"/tmp/aster-demo"</code>. If a database is already
-        stored at that path, RocksDB simply opens the existing one.
-      </p>
+      <h2 id="setup">Setup</h2>
 
       <div class="card">
+<pre class="mono">RocksGraph(Options&amp; options,
+           int edge_update_policy = EDGE_UPDATE_ADAPTIVE,
+           int encoding_type = ENCODING_TYPE_NONE,
+           bool auto_reinitialize = false,
+           std::string db_path = "/tmp/demo")</pre>
+        <p>Opens or creates a graph database at the given path.</p>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>Parameters</h3>
+        <ul>
+          <li><code>options</code> — RocksDB <code>Options</code>. Set <code>create_if_missing = true</code> for first use.</li>
+          <li><code>edge_update_policy</code> — how edge writes are handled. See <a href="#types">constants</a>.</li>
+          <li><code>encoding_type</code> — adjacency list compression. <code>ENCODING_TYPE_NONE</code> or <code>ENCODING_TYPE_EFP</code>.</li>
+          <li><code>auto_reinitialize</code> — if <code>true</code>, deletes any existing database at the path before opening.</li>
+          <li><code>db_path</code> — filesystem path for the database directory.</li>
+        </ul>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>Example</h3>
 <pre class="mono">#include "rocksdb/graph.h"
 #include "rocksdb/options.h"
 
@@ -163,128 +132,161 @@ rocksdb::RocksGraph graph(
     options,
     EDGE_UPDATE_ADAPTIVE,
     ENCODING_TYPE_NONE,
-    false,  // auto_reinitialize
+    false,
     "/tmp/aster-demo"
 );</pre>
       </div>
 
-      <div class="callout" style="margin-top:14px;">
-        <code>EDGE_UPDATE_ADAPTIVE</code> means Aster does not always use just one update method.
-        It decides at runtime whether to apply updates eagerly or lazily, depending on the current graph
-        and workload characteristics.
-      </div>
-      
-      <div class="callout" style="margin-top:14px;">
-        "encoding_type" controls how adjacency lists are stored in the main graph storage.
-        <code>ENCODING_TYPE_NONE</code> keeps raw adjacency lists, while <code>ENCODING_TYPE_EFP</code>
-        stores them in a compressed Elias–Fano-style format.
-      </div>
+      <!-- ───── Vertex Operations ───── -->
 
-      <div class="callout" style="margin-top:14px;">
-        Setting <code>auto_reinitialize</code> to <code>true</code> deletes the existing database
-        at that path before opening it. For normal usage, keep it <code>false</code> unless you
-        intentionally want a fresh DB.
-      </div>
-
-      <h2 id="core-apis">Core graph APIs</h2>
-      <div class="card">
-        <h3>Structure and mutation</h3>
-        <ul>
-          <li><code>AddVertex(node_id_t id)</code></li>
-          <li><code>AddEdge(node_id_t from, node_id_t to)</code></li>
-          <li><code>DeleteEdge(node_id_t from, node_id_t to)</code></li>
-        </ul>
-
-        <h3 style="margin-top: 30px;">Read and count</h3>
-        <ul>
-          <li><code>GetAllEdges(node_id_t src, Edges* edges)</code></li>
-          <li><code>GetOutDegree(node_id_t id)</code></li>
-          <li><code>GetInDegree(node_id_t id)</code></li>
-          <li><code>CountVertex()</code> — get the number of vertices from the graph metadata</li>
-          <li><code>CountEdge()</code> — get the number of edges from the graph metadata</li>
-        </ul>
-
-        <h3 style="margin-top: 30px;">Bulk load</h3>
-        <ul>
-          <li>
-            <code>AddVertexWithEdges(node_id_t id, std::vector&lt;node_id_t&gt;&amp; out_neighbors, std::vector&lt;node_id_t&gt;&amp; in_neighbors)</code>
-            — writes one new vertex and its full adjacency list in one step. It assumes the vertex is new and only writes that vertex’s own adjacency.
-          </li>
-          <li>
-            <code>AddEdges(node_id_t from, std::vector&lt;node_id_t&gt;&amp; tos, std::vector&lt;node_id_t&gt;&amp; froms)</code>
-            — helper that creates one vertex record from a full outgoing-neighbor list and incoming-neighbor list.
-          </li>
-          <li>
-            <code>AddVertexForBulkLoad()</code>
-            — increments the vertex count graph metadata during bulk loading.
-          </li>
-        </ul>
-      </div>
-
-      <h2>Example2 - Minimal graph</h2>
-      <p>
-        This mirrors the same basic flow used by the tiny example in <code>graph_test</code>:
-        add vertices, add edges, read neighbors, then delete one edge.
-      </p>
+      <h2 id="vertex">Vertex Operations</h2>
 
       <div class="card">
-<pre class="mono">#include &lt;iostream&gt;
+<pre class="mono">Status AddVertex(node_id_t id)</pre>
+        <p>Registers a new vertex. The vertex ID must be a positive 64-bit integer.</p>
+      </div>
 
-rocksdb::node_id_t u = 1, v = 2, w = 3;
+      <div class="card" style="margin-top:14px;">
+<pre class="mono">node_id_t CountVertex()</pre>
+        <p>Returns the total number of vertices from graph metadata.</p>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>Example</h3>
+<pre class="mono">rocksdb::node_id_t u = 1, v = 2, w = 3;
 
 graph.AddVertex(u);
 graph.AddVertex(v);
 graph.AddVertex(w);
 
-graph.AddEdge(u, v);
+std::cout &lt;&lt; graph.CountVertex();  // 3</pre>
+      </div>
+
+      <!-- ───── Edge Operations ───── -->
+
+      <h2 id="edge">Edge Operations</h2>
+
+      <div class="card">
+<pre class="mono">Status AddEdge(node_id_t from, node_id_t to)</pre>
+        <p>
+          Inserts a directed edge. The update method (eager, lazy, or adaptive) is determined
+          by the <code>edge_update_policy</code> set at construction.
+        </p>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+<pre class="mono">Status AddEdgeLazy(node_id_t from, node_id_t to)</pre>
+        <p>Forces a lazy (merge-operator) write regardless of the configured policy.</p>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+<pre class="mono">Status DeleteEdge(node_id_t from, node_id_t to)</pre>
+        <p>Removes a directed edge between two vertices.</p>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+<pre class="mono">Status GetAllEdges(node_id_t src, Edges* edges)</pre>
+        <p>
+          Reads the full adjacency list for a vertex into an <code>Edges</code> struct.
+          Call <code>free_edges(edges)</code> when done to release the allocated arrays.
+        </p>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+<pre class="mono">node_id_t CountEdge()</pre>
+        <p>Returns the total number of edges from graph metadata.</p>
+      </div>
+
+      <div class="callout" style="margin-top:14px;">
+        All edge operations are directed. For undirected behavior, add both
+        <code>AddEdge(u, v)</code> and <code>AddEdge(v, u)</code>.
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>Example</h3>
+<pre class="mono">graph.AddEdge(u, v);
 graph.AddEdge(u, w);
 
 rocksdb::Edges edges;
 if (graph.GetAllEdges(u, &amp;edges).ok()) {
-  for (uint32_t i = 0; i &lt; edges.num_edges_out; ++i) {
+  for (uint32_t i = 0; i &lt; edges.num_edges_out; ++i)
     std::cout &lt;&lt; edges.nxts_out[i].nxt &lt;&lt; "\n";
-  }
   free_edges(&amp;edges);
 }
 
 graph.DeleteEdge(u, v);</pre>
       </div>
 
-      <div class="callout" style="margin-top:14px;">
-        <code>GetAllEdges(...)</code> fills temporary in-memory arrays inside <code>Edges</code>.
-        Call <code>free_edges(&amp;edges)</code> when you are done with that result.
-        This only frees the returned arrays in your program. It does not delete anything from the database.
+      <!-- ───── Batch Operations ───── -->
+
+      <h2 id="edge-batch">Batch Operations</h2>
+
+      <div class="card">
+<pre class="mono">Status AddEdgeBatch(const std::vector&lt;std::pair&lt;node_id_t, node_id_t&gt;&gt;&amp; edges)</pre>
+        <p>Inserts multiple directed edges in one call.</p>
       </div>
 
-      <h2 id="property-apis">Properties APIs</h2>
+      <div class="card" style="margin-top:14px;">
+<pre class="mono">Status DeleteEdgeBatch(const std::vector&lt;std::pair&lt;node_id_t, node_id_t&gt;&gt;&amp; edges)</pre>
+        <p>Removes multiple directed edges in one call.</p>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+<pre class="mono">Status AddVertexWithEdges(node_id_t id,
+                          std::vector&lt;node_id_t&gt;&amp; out_neighbors,
+                          std::vector&lt;node_id_t&gt;&amp; in_neighbors)</pre>
+        <p>
+          Creates a new vertex with its full adjacency list in a single <code>WriteBatch</code>.
+          Only writes this vertex's own adjacency &mdash; reverse edges on neighbors are
+          <strong>not</strong> added automatically.
+        </p>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+<pre class="mono">std::pair&lt;std::string, std::string&gt; AddEdges(
+    node_id_t from,
+    std::vector&lt;node_id_t&gt;&amp; tos,
+    std::vector&lt;node_id_t&gt;&amp; froms)</pre>
+        <p>
+          Builds one vertex record from full outgoing and incoming neighbor lists.
+          Returns encoded key-value pair for direct insertion.
+        </p>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+<pre class="mono">void AddVertexForBulkLoad()</pre>
+        <p>Increments the vertex count in graph metadata during bulk loading.</p>
+      </div>
+
+      <!-- ───── Properties ───── -->
+
+      <h2 id="properties">Properties</h2>
       <p>
-        Aster supports both vertex properties and edge properties.
-        It also provides helper functions for finding vertices or edges with a matching property.
+        Vertices and edges can carry arbitrary key-value properties stored in separate
+        column families (<code>vprop_val</code>, <code>eprop_val</code>).
       </p>
 
       <div class="card">
-        <h3>Write and read properties</h3>
-        <ul>
-          <li><code>AddVertexProperty(node_id_t id, Property prop)</code></li>
-          <li><code>AddEdgeProperty(node_id_t from, node_id_t to, Property prop)</code></li>
-          <li><code>GetVertexProperty(node_id_t id, std::vector&lt;Property&gt;&amp; props)</code></li>
-          <li><code>GetEdgeProperty(node_id_t from, node_id_t to, std::vector&lt;Property&gt;&amp; props)</code></li>
-        </ul>
-        
-        <h3 style="margin-top: 30px;">Property lookup helpers</h3>
-        <ul>
-          <li><code>GetVerticesWithProperty(Property prop)</code> — returns a list of vertex IDs that have the given property.</li>
-          <li><code>GetEdgesWithProperty(Property prop)</code> — returns a list of directed edges, represented as <code>(from, to)</code> pairs, that have the given property.</li>
-        </ul>
+        <h3>Write</h3>
+<pre class="mono">Status AddVertexProperty(node_id_t id, Property prop)
+Status AddEdgeProperty(node_id_t from, node_id_t to, Property prop)</pre>
       </div>
 
-      <div class="callout" style="margin-top:14px;">
-        The lookup helpers are convenience scan helpers over the stored properties.
-        They are useful for testing and small workloads, but they are not secondary-index lookups.
+      <div class="card" style="margin-top:14px;">
+        <h3>Read</h3>
+<pre class="mono">Status GetVertexProperty(node_id_t id, std::vector&lt;Property&gt;&amp; props)
+Status GetEdgeProperty(node_id_t from, node_id_t to, std::vector&lt;Property&gt;&amp; props)</pre>
       </div>
 
-      <h2>Property example</h2>
-      <div class="card">
+      <div class="card" style="margin-top:14px;">
+        <h3>Scan by property</h3>
+<pre class="mono">std::vector&lt;node_id_t&gt; GetVerticesWithProperty(Property prop)
+std::vector&lt;std::pair&lt;node_id_t, node_id_t&gt;&gt; GetEdgesWithProperty(Property prop)</pre>
+        <p>Scan-based reverse lookup. Useful for testing and small workloads, not a secondary index.</p>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>Example</h3>
 <pre class="mono">rocksdb::Property vp{.name = "kind", .value = "paper"};
 graph.AddVertexProperty(u, vp);
 
@@ -300,43 +302,117 @@ graph.GetEdgeProperty(u, w, eprops);
 auto matched = graph.GetVerticesWithProperty(vp);</pre>
       </div>
 
-      <div class="callout" style="margin-top:14px;">
-        <code>AddVertexWithEdges(...)</code> writes the adjacency for one vertex.
-        It does not automatically update reverse edges on neighbor vertices for you.
-      </div>
+      <!-- ───── Degree Queries ───── -->
 
-      <h2 id="other-apis">Other APIs</h2>
+      <h2 id="degree">Degree Queries</h2>
+
       <div class="card">
-        <h3>Approximate, traversal, and diagnostics</h3>
-        <ul>
-          <li>
-            <code>GetDegreeApproximate(node_id_t id)</code>
-            — returns an approximate degree estimate for a vertex. It supports
-            <code>FILTER_TYPE_CMS</code> (Count-Min Sketch) and
-            <code>FILTER_TYPE_MORRIS</code> (Morris Counter), which are useful when
-            a lightweight estimate is enough and an exact degree is not required.
-          </li>
-
-          <li>
-            <code>SimpleWalk(node_id_t start, float decay_factor)</code>
-            — performs a random-walk style traversal starting from the given vertex.
-            This API is mainly useful for traversal experiments or lightweight graph
-            sampling.
-          </li>
-
-          <li>
-            <code>GetRocksDBStats(std::string& stat)</code>
-            — retrieves internal RocksDB statistics as a string, which is useful for
-            debugging, profiling, and understanding storage-level behavior.
-          </li>
-
-          <li>
-            <code>printLSM(int column)</code>
-            — prints LSM-tree information for inspection, helping users examine how
-            graph data is organized internally across storage levels.
-          </li>
-        </ul>
+        <h3>Exact</h3>
+<pre class="mono">node_id_t GetOutDegree(node_id_t id)
+node_id_t GetInDegree(node_id_t id)</pre>
+        <p>Read the adjacency list and return the exact out-degree or in-degree.</p>
       </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>Approximate</h3>
+<pre class="mono">node_id_t GetDegreeApproximate(node_id_t id, int filter_type = 0)</pre>
+        <p>
+          O(1) degree estimation without reading the adjacency list.
+          Uses the Morris Counter (<code>FILTER_TYPE_MORRIS</code>) by default.
+        </p>
+      </div>
+
+      <div class="callout" style="margin-top:14px;">
+        The adaptive update policy uses these estimators internally to decide between
+        eager and lazy writes.
+      </div>
+
+      <!-- ───── Traversal ───── -->
+
+      <h2 id="traversal">Traversal</h2>
+
+      <div class="card">
+<pre class="mono">Status SimpleWalk(node_id_t start, float decay_factor = 0.20)</pre>
+        <p>
+          Random-walk traversal from a starting vertex. At each step the walk continues
+          with probability <code>1 - decay_factor</code>. Useful for graph sampling experiments.
+        </p>
+      </div>
+
+      <!-- ───── Diagnostics ───── -->
+
+      <h2 id="diagnostics">Diagnostics</h2>
+
+      <div class="card">
+<pre class="mono">void GetRocksDBStats(std::string&amp; stat)</pre>
+        <p>Writes internal RocksDB statistics into a string for profiling and debugging.</p>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+<pre class="mono">void printLSM(int column = 0)</pre>
+        <p>Prints the LSM-tree structure for the given column family to stdout.</p>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+<pre class="mono">DB* get_raw_db()</pre>
+        <p>Returns a pointer to the underlying RocksDB instance for advanced use.</p>
+      </div>
+
+      <!-- ───── Types & Constants ───── -->
+
+      <h2 id="types">Types &amp; Constants</h2>
+
+      <div class="card">
+        <h3>Identifiers</h3>
+<pre class="mono">using node_id_t = int64_t;   // vertex ID (positive)
+using edge_id_t = int64_t;   // edge ID (internal)</pre>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>Data structures</h3>
+<pre class="mono">struct Edge {
+  node_id_t nxt;              // neighbor vertex ID
+};
+
+struct Edges {
+  uint32_t num_edges_out;     // outgoing count
+  uint32_t num_edges_in;      // incoming count
+  Edge* nxts_out;             // outgoing array
+  Edge* nxts_in;              // incoming array
+};
+
+struct Property {
+  std::string name;
+  std::string value;
+};</pre>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>Edge update policies</h3>
+<pre class="mono">EDGE_UPDATE_EAGER      0x0   // read-merge-write
+EDGE_UPDATE_LAZY       0x1   // merge operator
+EDGE_UPDATE_ADAPTIVE   0x2   // runtime decision (default)
+EDGE_UPDATE_FULL_LAZY  0x3   // full lazy variant</pre>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>Encoding types</h3>
+<pre class="mono">ENCODING_TYPE_NONE     0x0   // raw adjacency lists
+ENCODING_TYPE_EFP      0x1   // Elias-Fano compression</pre>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>Degree filter types</h3>
+<pre class="mono">FILTER_TYPE_NONE       0x0
+FILTER_TYPE_MORRIS     0x2   // Morris Counter (default)</pre>
+      </div>
+
+      <div class="callout" style="margin-top:14px;">
+        After calling <code>GetAllEdges()</code>, always call <code>free_edges(&amp;edges)</code>
+        to release the returned arrays. This frees in-process memory only &mdash;
+        it does not delete data from the database.
+      </div>
+
     </article>
   </div>
 </main>
@@ -345,7 +421,7 @@ auto matched = graph.GetVerticesWithProperty(vp);</pre>
   <div class="container footer-grid">
     <div>
       <div class="footer-title">Aster Docs</div>
-      <div>Installation • Quick Start • Key Features • API • Benchmarks</div>
+      <div>Installation • Quick Start • Key Features • Graph Operations • Benchmarks</div>
     </div>
     <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
       <a href="../index.html">Landing</a>
